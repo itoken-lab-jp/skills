@@ -1,0 +1,13 @@
+# cold-read
+
+書いた本人の AI は経緯を知っているため、同じ AI に見直させても、説明を省いた言葉が通じるように見えてしまいます。cold-read は、文章の写しだけを、会話も指示ファイル（CLAUDE.md・AGENTS.md など）も読まないサブエージェントに読ませる手順です。読み手には、意味が分からなかった所（「それ何？」）と、自分に何の関係があるか分からなかった所（「だから何？」）を挙げさせます。直したあとは、前の版を見ていない別のサブエージェントに読ませ直します。サブエージェントを立てて読ませ、挙がった所を直すのはエージェントです。人は「この README を cold-read して」と頼むだけです。
+
+参考にした資料は [adversarial-review の説明](adversarial-review.md#参考にした資料) にまとめています。
+
+## 入れ方
+
+```
+npx skills add itoken33/skills -g --skill cold-read
+```
+
+手順の本文は [SKILL.md](../skills/cold-read/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。

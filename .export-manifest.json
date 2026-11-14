@@ -10,6 +10,11 @@
     "agents/claude/readonly-reviewer.md",
     "agents/kiro/cold-reader.md",
     "agents/kiro/readonly-reviewer.md",
+    "docs/adversarial-review.md",
+    "docs/cold-read.md",
+    "docs/excel-read.md",
+    "docs/japanese-writing.md",
+    "docs/pdf-read.md",
     "skills/adversarial-review/SKILL.md",
     "skills/adversarial-review/references/later-rounds.md",
     "skills/adversarial-review/references/running.md",
@@ -35,6 +40,7 @@
     "tools/excel-read/.gitignore",
     "tools/excel-read/Cargo.lock",
     "tools/excel-read/Cargo.toml",
+    "tools/excel-read/bench/bench.py",
     "tools/excel-read/build-all.sh",
     "tools/excel-read/build.rs",
     "tools/excel-read/fixtures/LICENSE-calamine.md",
@@ -50,6 +56,7 @@
     "tools/excel-read/licenses/musl-1.2.5-COPYRIGHT",
     "tools/excel-read/make-notices.py",
     "tools/excel-read/src/main.rs",
-    "tools/excel-read/src/pkg.rs"
+    "tools/excel-read/src/pkg.rs",
+    "tools/pdf-read/bench.py"
   ]
 }
