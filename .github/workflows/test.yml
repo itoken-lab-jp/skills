@@ -35,3 +35,5 @@ jobs:
         run: node --test test/excel-read.test.mjs
       - name: 試験（db-read の exe）
         run: node --test test/db-read.test.mjs
+      - name: 試験（版の変更の一覧 tools/release-notes.mjs）
+        run: node --test test/release-notes.test.mjs

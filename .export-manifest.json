@@ -1,6 +1,7 @@
 {
   "files": [
     ".gitattributes",
+    ".github/workflows/release.yml",
     ".github/workflows/test.yml",
     "LICENSE",
     "README.md",
@@ -75,6 +76,7 @@
     "test/excel-read.test.mjs",
     "test/japanese-writing.test.mjs",
     "test/powerbi-pbip.test.mjs",
+    "test/release-notes.test.mjs",
     "tools/data-query/bench.py",
     "tools/db-read/.gitignore",
     "tools/db-read/Cargo.lock",
@@ -163,6 +165,7 @@
     "tools/excel-read/src/main.rs",
     "tools/excel-read/src/pkg.rs",
     "tools/pdf-read/bench.py",
+    "tools/release-notes.mjs",
     "tools/test-workflow/bench_xdist.py"
   ]
 }

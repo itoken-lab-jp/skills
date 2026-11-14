@@ -1,0 +1,40 @@
+name: release
+
+# 版のタグ（v2026.11.14・v2026.11.14.2）を push すると、前の版からの変更を Release に載せる。
+# 変更の説明は docs/<Skill>.md の「## 変更履歴」から tools/release-notes.mjs が集める。
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - name: 版の形のタグか確かめる
+        run: |
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]{4}\.[0-9]{2}\.[0-9]{2}(\.[0-9]+)?$ ]]; then
+            echo "::error::版の形（v2026.11.14・v2026.11.14.2）でないタグなので Release を作らない：$GITHUB_REF_NAME"
+            exit 1
+          fi
+      - name: 変更の一覧を作る
+        run: node tools/release-notes.mjs --to "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+      - name: Release を作る（同じ版の Release があれば本文を差し替える）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md"
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
+          fi
