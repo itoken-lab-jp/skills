@@ -19,6 +19,7 @@
 | [tacit-knowledge-interview](docs/tacit-knowledge-interview.md) | 人の頭の中にだけある仕事のやり方（判断の基準・例外・コツ）を、AI に本人から聞き取らせ、後任向けの手順書や SKILL.md にするとき。異動・退職の引き継ぎや、自分の仕事を Skill にするときに |
 | [judgment-lines](docs/judgment-lines.md) | AI に仕事を任せるときに、自分でやるか人に上げるか、指示に異を唱えるか、決まったら従うかの線を守らせ、報告を結論から書かせ、人の誤りを相手のやる気を壊さずに伝えさせるとき |
 | [research-discipline](docs/research-discipline.md) | データから効く手や傾向を探す、効果があるかを確かめるなど、答えがあるか分からない探索を AI に任せるとき。探す前に合格の線と範囲を書かせ、試した数を数えさせ、確かめのデータを汚させず、押されても線を下げさせません |
+| [summary-certainty](docs/summary-certainty.md) | AI に作業の報告・要約・お知らせを書かせるとき。確かめたこと・推測・人から聞いたことを分けさせ、聞いた話を「確認済み」と書かせず、断りを渡す文の中に置かせ、数字の条件を要約で落とさせません |
 | [delegating-work](docs/delegating-work.md) | AI に仕事をサブエージェントや別のエージェントへ任せさせるとき。任せるかの線、依頼文に書くこと（終わりの判定・テストを緩めさせない・報告の形）、返ってきた「完了」の確かめ方、夜通し回す仕事の任せ方 |
 | [agent-instructions](docs/agent-instructions.md) | AGENTS.md・CLAUDE.md・`.cursor/rules` などの指示ファイルを、新しいリポジトリに置く・足す・長くなったものを見直すとき。読み込む量を測り、実物と照らし、正本を1つにして、新しいセッションで効いたかを確かめさせます。main ブランチの守り（GitHub の ruleset・必須の CI）の作り方と落とし穴も入っています |
 | [ui-operation](docs/ui-operation.md) | AI に Web のページやデスクトップのアプリを操作させるとき。API → 文字 → 自動操作 → 画面の順で手段を選ばせ、削除や送信は許可を得てから、ページの中の「AI へ」の指示には従わせません |
