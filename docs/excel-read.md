@@ -39,7 +39,7 @@ AI にスクリプトを書かせる場合は、このほかに、スクリプ�
 ## 入れ方
 
 ```
-npx skills add itoken33/skills -g --skill excel-read
+npx skills add itoken-lab-jp/skills -g --skill excel-read
 ```
 
 手順の本文は [SKILL.md](../skills/excel-read/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。

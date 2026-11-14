@@ -64,7 +64,7 @@ Skill ありの数字は4版目で測りました。公開している版は、�
 ## 入れ方
 
 ```
-npx skills add itoken33/skills -g --skill judgment-lines
+npx skills add itoken-lab-jp/skills -g --skill judgment-lines
 ```
 
 `-g` は、プロジェクトごとではなく、自分のユーザーのどのプロジェクトでも使える場所に入れる指定です。手順の本文は [SKILL.md](../skills/judgment-lines/SKILL.md) です。入れ方の詳しい説明（置かれる場所、ツールごとの違い）は [README](../README.md#入れ方) にあります。

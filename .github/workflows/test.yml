@@ -28,5 +28,7 @@ jobs:
           node-version: 22
       - name: 試験（japanese-writing の検査スクリプト）
         run: node --test test/japanese-writing.test.mjs
+      - name: 試験（powerbi-pbip の読み直しのスクリプト）
+        run: node --test test/powerbi-pbip.test.mjs
       - name: 試験（excel-read の exe）
         run: node --test test/excel-read.test.mjs

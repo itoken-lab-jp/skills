@@ -9,8 +9,11 @@
 | [japanese-writing](docs/japanese-writing.md) | 日本語の文章（PR や Issue の本文・README・docs・報告・メール・手順書・議事録・記事）を AI に書かせる・直させる・見直させるとき |
 | [excel-read](docs/excel-read.md) | Excel（.xlsx・.xlsm・.xls・.xlsb・.ods）を AI に読ませるとき。結合セル・複数行の見出しがある帳票、計算式、Power Query と VBA のコードも読めます。自動で作ったブックを Linux で読ませた測定では、Python のスクリプトの3〜13倍の速さでした（[測り方と条件](docs/excel-read.md#速さとメモリ)） |
 | [pdf-read](docs/pdf-read.md) | PDF（資料・表・帳票、スキャン、縦書き）を AI に読ませるとき。スキャンは OCR し、金額などの怪しい所はページの画像で確かめさせます |
+| [data-query](docs/data-query.md) | CSV・JSON・Parquet を AI に集計させるとき。pandas のスクリプトを書かせず、DuckDB の SQL を1本走らせます。Shift_JIS の CSV も読めます。200万行の CSV の集計で pandas の約5倍の速さでした（[測り方と条件](docs/data-query.md#速さとメモリ)） |
+| [powerbi-pbip](docs/powerbi-pbip.md) | Power BI Desktop のレポートとモデル（PBIP）を AI に作らせる・直させるとき。DAX・M・TMDL を書いて DAX のクエリで値を確かめ、開いている Desktop に読み直させて撮ります。未保存の変更を消さない守りつき |
 | [cold-read](docs/cold-read.md) | AI が書いた文章（README・docs・記事）を、経緯を知らない別のエージェントに読ませて、伝わらない所を見つけるとき |
 | [adversarial-review](docs/adversarial-review.md) | 変更（コード・設計・文書）の欠陥を、作った本人の意図を渡さずに別のエージェントに探させるとき。指摘の重さの決め方と、2巡目以降の打ち切り方まで |
+| [skill-authoring](docs/skill-authoring.md) | AI に Skill（SKILL.md）を作らせる・直させるとき。Skill にするかの決め方、呼ばれる description の書き方、要約で消えない本文の置き方、呼ばれるか・従われるかの確かめ方まで |
 | [tacit-knowledge-interview](docs/tacit-knowledge-interview.md) | 人の頭の中にだけある仕事のやり方（判断の基準・例外・コツ）を、AI に本人から聞き取らせ、後任向けの手順書や SKILL.md にするとき。異動・退職の引き継ぎや、自分の仕事を Skill にするときに |
 | [judgment-lines](docs/judgment-lines.md) | AI に仕事を任せるときに、自分でやるか人に上げるか、指示に異を唱えるか、決まったら従うかの線を守らせ、報告を結論から書かせ、人の誤りを相手のやる気を壊さずに伝えさせるとき |
 
@@ -33,13 +36,13 @@ Codex は、定義でサブエージェントの道具を読み取りだけに�
 [skills](https://github.com/vercel-labs/skills)（Vercel が公開している、Skill を各ツールに入れる CLI）で入れます。実行には Node.js が必要です。
 
 ```
-npx skills add itoken33/skills -g
+npx skills add itoken-lab-jp/skills -g
 ```
 
 実行すると、入れる Skill と、入れる先のツールを選ぶ画面が出ます。使っているツールをすべて選びます。1つの Skill だけを入れる場合は、`--skill` で名前を指定します。
 
 ```
-npx skills add itoken33/skills -g --skill excel-read
+npx skills add itoken-lab-jp/skills -g --skill excel-read
 ```
 
 `-g` を付けると、全部のプロジェクトで使える置き場（ホームフォルダーの下）に入ります。チームでリポジトリごとに共有する場合は、`-g` を付けずにリポジトリのフォルダーで実行し、できたフォルダー（`.agents/skills/` など）をコミットします。

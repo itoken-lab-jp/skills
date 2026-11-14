@@ -161,7 +161,7 @@ node skills/japanese-writing/scripts/check.mjs 文章.md
 ## 入れ方
 
 ```
-npx skills add itoken33/skills -g --skill japanese-writing
+npx skills add itoken-lab-jp/skills -g --skill japanese-writing
 ```
 
 手順の本文は [SKILL.md](../skills/japanese-writing/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。

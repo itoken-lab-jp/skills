@@ -36,7 +36,7 @@ python3 tools/pdf-read/bench.py 01.pdf 060.pdf --tessdata <tessdata_best のフ�
 ## 入れ方
 
 ```
-npx skills add itoken33/skills -g --skill pdf-read
+npx skills add itoken-lab-jp/skills -g --skill pdf-read
 ```
 
 手順の本文は [SKILL.md](../skills/pdf-read/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
