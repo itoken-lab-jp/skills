@@ -1,0 +1,25 @@
+# CI（.github/workflows/db-read.yml）と手元の Docker の試しの DB につなぐ設定。パスワードは環境変数から読む。
+[pg]
+kind = "postgres"
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+
+[my]
+kind = "mysql"
+database = "app"
+user = "root"
+password_env = "MY_PW"
+
+[ms]
+kind = "sqlserver"
+database = "master"
+user = "sa"
+password_env = "MS_PW"
+trust_cert = true
+
+[ora]
+kind = "oracle"
+database = "FREEPDB1"
+user = "app"
+password_env = "ORA_PW"

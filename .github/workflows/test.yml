@@ -2,6 +2,7 @@ name: test
 
 # Skill に入っている道具の試験を、Windows・Mac・Linux で走らせる。
 # excel-read は、同梱の exe がソース（tools/excel-read）から作られたものかを指紋で確かめ、その機械の exe でダミーの帳票を読む。
+# db-read も同じく指紋を確かめ、その機械の exe で、DB につながずに分かること（使い方・書き換える文を断る・設定の誤り）を確かめる。
 
 on:
   push:
@@ -32,3 +33,5 @@ jobs:
         run: node --test test/powerbi-pbip.test.mjs
       - name: 試験（excel-read の exe）
         run: node --test test/excel-read.test.mjs
+      - name: 試験（db-read の exe）
+        run: node --test test/db-read.test.mjs

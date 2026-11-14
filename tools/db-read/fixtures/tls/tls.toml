@@ -1,0 +1,107 @@
+# fixtures/tls/start.sh で立てた、自分の CA を使う MySQL（3307）と PostgreSQL（5433）につなぐ設定。
+# サーバーの証明書の名前は localhost だけ（IP を持たない）。ca_cert の相対パスはこのファイルの置き場から。
+[my_ca]
+kind = "mysql"
+host = "localhost"
+port = 3307
+user = "root"
+password_env = "MY_PW"
+ca_cert = "certs/ca.pem"
+
+[my_ca_ip]
+kind = "mysql"
+host = "127.0.0.1"
+port = 3307
+user = "root"
+password_env = "MY_PW"
+ca_cert = "certs/ca.pem"
+
+[my_ca_ip_chain]
+kind = "mysql"
+host = "127.0.0.1"
+port = 3307
+user = "root"
+password_env = "MY_PW"
+ca_cert = "certs/ca.pem"
+verify_host = false
+
+[my_other_ca]
+kind = "mysql"
+host = "127.0.0.1"
+port = 3307
+user = "root"
+password_env = "MY_PW"
+ca_cert = "certs/other-ca.pem"
+verify_host = false
+
+[my_os]
+kind = "mysql"
+host = "localhost"
+port = 3307
+user = "root"
+password_env = "MY_PW"
+tls = true
+
+[my_trust]
+kind = "mysql"
+host = "127.0.0.1"
+port = 3307
+user = "root"
+password_env = "MY_PW"
+trust_cert = true
+
+[pg_ca]
+kind = "postgres"
+host = "localhost"
+port = 5433
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+ca_cert = "certs/ca.pem"
+
+[pg_ca_ip]
+kind = "postgres"
+host = "127.0.0.1"
+port = 5433
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+ca_cert = "certs/ca.pem"
+
+[pg_ca_ip_chain]
+kind = "postgres"
+host = "127.0.0.1"
+port = 5433
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+ca_cert = "certs/ca.pem"
+verify_host = false
+
+[pg_other_ca]
+kind = "postgres"
+host = "127.0.0.1"
+port = 5433
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+ca_cert = "certs/other-ca.pem"
+verify_host = false
+
+[pg_os]
+kind = "postgres"
+host = "localhost"
+port = 5433
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+tls = true
+
+[pg_trust]
+kind = "postgres"
+host = "127.0.0.1"
+port = 5433
+database = "postgres"
+user = "postgres"
+password_env = "PG_PW"
+trust_cert = true

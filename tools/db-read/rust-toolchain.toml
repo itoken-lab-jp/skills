@@ -1,0 +1,6 @@
+# exe を作る Rust の版。3つの exe（Mac は Actions の mac-build で作る）と THIRD_PARTY_NOTICES.md の版をそろえる
+# （test/db-read.test.mjs が、exe に入った Rust の版と表示の版の食い違いを赤にする）。上げたら3つとも作り直し、make-notices.py も走らせる。
+[toolchain]
+channel = "1.97.0"
+profile = "minimal"
+targets = ["x86_64-pc-windows-gnu", "x86_64-unknown-linux-musl", "aarch64-apple-darwin"]
