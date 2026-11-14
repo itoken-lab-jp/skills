@@ -11,7 +11,7 @@ PDF は、Python などでスクリプトを書かずに読む。文字の層が
 
 Poppler（`pdftotext`・`pdftoppm`・`pdfinfo`・`pdffonts`・`pdfimages`）と tesseract は、PC ごとに一度入れる。この Skill には入っていない。
 
-- どこにあるかは、全体の指示ファイル（ホームの CLAUDE.md・AGENTS.md など）にその PC の道具の場所が書いてあれば従う。書いていなければ、PATH を探す（Windows は `Get-Command pdftotext, tesseract`、Mac と Linux は `command -v pdftotext tesseract`）。
+- どこにあるかは、全体の指示ファイル（`~/.claude/CLAUDE.md`・`~/.codex/AGENTS.md` など）にその PC の道具の場所が書いてあれば従う。書いていなければ、PATH を探す（Windows は `Get-Command pdftotext, tesseract`、Mac と Linux は `command -v pdftotext tesseract`）。
 - 無ければユーザーに入れてもらう。エージェントが自分で落として入れない。
   - Windows：`winget install oschwartz10612.Poppler`（日本語の言語データ poppler-data を同梱）と `winget install UB-Mannheim.TesseractOCR`。winget が使えない PC は、それぞれの GitHub のリリース（oschwartz10612/poppler-windows、UB-Mannheim/tesseract）から置く。
   - Mac：`brew install poppler tesseract`。
