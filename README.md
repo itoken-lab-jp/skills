@@ -1,6 +1,6 @@
 # skills
 
-AI エージェントに日本語の文章を書かせるときに使う Skill 集です。Skill は、エージェントが作業に合わせて読み込む手順書（`SKILL.md` と、付属の資料・スクリプトのフォルダー）です。共通の形式（[Agent Skills](https://agentskills.io/specification)）のため、Claude Code・Codex・Cursor・GitHub Copilot・Antigravity・Kiro で同じものを使えます。Skill は今後もこのリポジトリに追加します。
+日本語の仕事で AI エージェントを使うときの Skill 集です。日本語の文章を書かせる、Excel の帳票を読ませる、といった作業の手順と道具が入っています。Skill は、エージェントが作業に合わせて読み込む手順書（`SKILL.md` と、付属の資料・スクリプトのフォルダー）です。共通の形式（[Agent Skills](https://agentskills.io/specification)）のため、Claude Code・Codex・Cursor・GitHub Copilot・Antigravity・Kiro で同じものを使えます。Skill は今後もこのリポジトリに追加します。
 
 ## Skill の一覧
 
@@ -78,4 +78,8 @@ CLI を使わない場合は、このリポジトリをクローンし、`skills
 
 ## ライセンス
 
-MIT ライセンスです（[LICENSE](LICENSE)）。ほかの人が作ったものを取り入れた所は2つあり、それぞれのライセンスの表示を同じフォルダーに置いています。japanese-writing の検査スクリプトは、MIT ライセンスの textlint のルール集から語の一覧を取り入れています（[表示](skills/japanese-writing/scripts/THIRD_PARTY_NOTICES.md)）。excel-read の実行ファイルは、Rust のライブラリを組み込んでいます（[表示](skills/excel-read/THIRD_PARTY_NOTICES.md)）。
+MIT ライセンスです（[LICENSE](LICENSE)）。ほかの人が作ったものを取り入れた所には、それぞれのライセンスの表示を置いています。
+
+- japanese-writing の検査スクリプトは、MIT ライセンスの textlint のルール集から語の一覧を取り入れています（[表示](skills/japanese-writing/scripts/THIRD_PARTY_NOTICES.md)）。
+- excel-read の実行ファイルは、Rust のライブラリと、静的にリンクしたランタイム（Rust の標準ライブラリ・musl・mingw-w64）を組み込んでいます（[表示](skills/excel-read/THIRD_PARTY_NOTICES.md)）。
+- excel-read の試験に使う `tools/excel-read/fixtures/vba.xlsm` は、calamine の試験ファイルを写したものです（[表示](tools/excel-read/fixtures/LICENSE-calamine.md)）。

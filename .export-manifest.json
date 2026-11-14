@@ -36,6 +36,7 @@
     "tools/excel-read/fixtures/unordered-tables.xlsx",
     "tools/excel-read/fixtures/unordered.xlsx",
     "tools/excel-read/fixtures/vba.xlsm",
+    "tools/excel-read/licenses/musl-1.2.5-COPYRIGHT",
     "tools/excel-read/make-notices.py",
     "tools/excel-read/src/main.rs",
     "tools/excel-read/src/pkg.rs"

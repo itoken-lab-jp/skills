@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -54,6 +55,18 @@ test('3つの exe がどれも今のソースから作ってある（直した�
     assert.ok(fs.existsSync(file), `${file} が無い`);
     assert.ok(fs.readFileSync(file).includes(Buffer.from(hash)), `${dir} の exe がソースと食い違う（指紋 ${hash} を含まない）`);
   }
+});
+
+test('第三者の表示が今の Cargo.lock と、exe を作った Rust の版から作ってある（直したら tools/excel-read/make-notices.py）', () => {
+  const notices = fs.readFileSync(path.join(root, 'skills/excel-read/THIRD_PARTY_NOTICES.md'), 'utf8');
+  const lock = crypto.createHash('sha256').update(fs.readFileSync(path.join(src, 'Cargo.lock'), 'utf8').replace(/\r\n/g, '\n')).digest('hex');
+  assert.match(notices, new RegExp(`Cargo\\.lock sha256: ${lock}`), 'Cargo.lock を変えたのに表示を作り直していない');
+  const rust = notices.match(/## Rust の標準ライブラリ（rustc (\S+)[^\n]*\n\nhttps:\/\/github\.com\/rust-lang\/rust\/tree\/([0-9a-f]{40})/);
+  assert.ok(rust, '表示に Rust の標準ライブラリの節が無い');
+  for (const [dir, name] of Object.entries(builds)) {
+    assert.ok(fs.readFileSync(path.join(bin, dir, name)).includes(Buffer.from(`rustc/${rust[2]}`)), `${dir} の exe は Rust ${rust[1]}（${rust[2]}）で作っていない（表示と食い違う）`);
+  }
+  for (const part of ['## musl ', '## mingw-w64 ']) assert.ok(notices.includes(part), `表示に「${part.slice(3)}」の節が無い`);
 });
 
 test('この機械の exe が動き、指紋を名乗る', { skip: !exe && `${process.platform}-${process.arch} 向けの exe は作っていない` }, () => {
