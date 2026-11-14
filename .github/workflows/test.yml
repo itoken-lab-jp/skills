@@ -1,0 +1,32 @@
+name: test
+
+# Skill に入っている道具の試験を、Windows・Mac・Linux で走らせる。
+# excel-read は、同梱の exe がソース（tools/excel-read）から作られたものかを指紋で確かめ、その機械の exe でダミーの帳票を読む。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - name: 試験（japanese-writing の検査スクリプト）
+        run: node --test test/japanese-writing.test.mjs
+      - name: 試験（excel-read の exe）
+        run: node --test test/excel-read.test.mjs

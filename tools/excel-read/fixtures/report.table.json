@@ -1,0 +1,8 @@
+{
+  "sheet": "月次報告",
+  "range": "A4:F",
+  "header_rows": 2,
+  "drop_rows": [{ "column": "B", "equals": "小計" }],
+  "stop_when": { "column": "A", "starts_with": "合計" },
+  "note": "部門別の明細だけを出す。小計の行は捨て、合計の行の手前で終える"
+}
