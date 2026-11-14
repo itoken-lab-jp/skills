@@ -71,3 +71,7 @@ npx skills add itoken-lab-jp/skills -g --skill test-workflow
 ```
 
 Claude Code・Codex・Cursor・GitHub Copilot・Antigravity に入ります。`-g` は、全部のプロジェクトで使える置き場に入れる指定です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-14：docs の試した結果に、採点の一部を作者が全記録で数え直したことを書いた。SKILL.md の数字に、測った日と環境（2026-10-30、クラウドの Linux）を書いた。
