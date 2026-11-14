@@ -1,6 +1,6 @@
 # skills
 
-日本語の仕事で AI エージェントを使うときの Skill 集です。日本語の文章を書かせる、Excel の帳票を読ませる、といった作業の手順と道具が入っています。Skill は、エージェントが作業に合わせて読み込む手順書（`SKILL.md` と、付属の資料・スクリプトのフォルダー）です。共通の形式（[Agent Skills](https://agentskills.io/specification)）のため、Claude Code・Codex・Cursor・GitHub Copilot・Antigravity・Kiro で同じものを使えます。Skill は今後もこのリポジトリに追加します。
+日本語の仕事で AI エージェントを使うときの Skill 集です。日本語の文章を書かせる、Excel や PDF の帳票を読ませる、といった作業の手順と道具が入っています。Skill は、エージェントが作業に合わせて読み込む手順書（`SKILL.md` と、付属の資料・スクリプトのフォルダー）です。共通の形式（[Agent Skills](https://agentskills.io/specification)）のため、Claude Code・Codex・Cursor・GitHub Copilot・Antigravity・Kiro で同じものを使えます。Skill は今後もこのリポジトリに追加します。
 
 ## Skill の一覧
 
@@ -8,6 +8,7 @@
 |---|---|
 | [japanese-writing](skills/japanese-writing/SKILL.md) | 日本語の文章（PR や Issue の本文・README・docs・報告・メール・手順書・議事録・記事）を AI に書かせる・直させる・見直させるとき |
 | [excel-read](skills/excel-read/SKILL.md) | Excel（.xlsx・.xlsm・.xls・.xlsb・.ods）を AI に読ませるとき。結合セル・複数行の見出しがある帳票、計算式、Power Query と VBA のコードも読めます |
+| [pdf-read](skills/pdf-read/SKILL.md) | PDF（資料・表・帳票、スキャン、縦書き）を AI に読ませるとき。スキャンは OCR し、金額などの怪しい所はページの画像で確かめさせます |
 
 ### japanese-writing
 
@@ -42,6 +43,14 @@ excel-read table 売上報告.xlsx --sheet 10月 --header-rows 2
 結合セルは値を埋め、2段の見出しは「上の見出し/下の見出し」の1つの列名にします。隠した行や、単位の付いた表示形式のように読み違えやすい箇所は、注意として標準エラーに出します。コマンドの一覧は `excel-read --help` で出ます。読めないもの（文字の色や塗り、図形、パスワード付きのファイル）は [references/limits.md](skills/excel-read/references/limits.md) にあります。
 
 同梱の実行ファイルは Windows（x64）・Mac（Apple シリコン）・Linux（x64）の3つです。Rust で書いたソースは [tools/excel-read](tools/excel-read) にあり、実行ファイルにはソースの指紋が入っています。このリポジトリの CI は、指紋がソースと合うことと、3つの OS でダミーの帳票を読めることを確かめています。自分で作り直す場合は [tools/excel-read/build-all.sh](tools/excel-read/build-all.sh) を Linux で実行します。Mac の実行ファイルは、Apple の公証を受けていない署名（ad-hoc 署名）です。ブラウザで zip をダウンロードして展開した場合は、macOS が実行を止めることがあります。
+
+### pdf-read
+
+PDF から文字を取り出すスクリプトを AI に書かせると、表の列や縦書きが崩れがちです。スキャンした PDF は、文字の層（PDF に埋め込まれた文字のデータ）が無いので、取り出しても空になります。pdf-read では、エージェントはスクリプトを書きません。まず PDF に文字の層があるかを調べ、あれば Poppler の `pdftotext -layout` で列の位置を保ったまま読み、無ければページを画像にして tesseract で OCR します。
+
+OCR は日本語の帳票（請求書・伝票・決算の表など）で、マイナスを表す ▲ やカンマをよく誤ります。そこで、tesseract が語ごとに出す確信度が低い語や、`4A410.000` のように形のおかしい数字を拾い、そのページの画像をエージェントが直接見て読み直します。金額・数量・日付は、拾った所が無くても画像と突き合わせます。画像を読めないエージェントでは、確かめていない値をそう書いて報告します。
+
+この Skill には道具が入っていません。Poppler（`pdftotext` や、ページを画像にする `pdftoppm` を含むコマンド群）と tesseract を、エージェントが動く PC に一度入れてください。Windows は winget、Mac は Homebrew、Linux は apt で入ります。日本語の OCR には、標準のデータより精度の高い [tessdata_best](https://github.com/tesseract-ocr/tessdata_best) の `jpn.traineddata` と、縦書き用の `jpn_vert.traineddata` を使います。入れ方と置き場所は [SKILL.md](skills/pdf-read/SKILL.md) の「道具の場所」にあります。
 
 ## 入れ方
 

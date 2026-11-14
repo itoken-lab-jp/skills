@@ -19,6 +19,7 @@
     "skills/japanese-writing/scripts/THIRD_PARTY_NOTICES.md",
     "skills/japanese-writing/scripts/ai-words.mjs",
     "skills/japanese-writing/scripts/check.mjs",
+    "skills/pdf-read/SKILL.md",
     "test/excel-read.test.mjs",
     "test/japanese-writing.test.mjs",
     "tools/excel-read/.gitignore",
