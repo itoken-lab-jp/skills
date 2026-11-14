@@ -1,6 +1,6 @@
 ---
 name: powerbi-pbip
-description: AI から Power BI Desktop のレポートとセマンティックモデルを作る・直す・確かめるときの手順。PBIP（PBIR の JSON・TMDL）を直接直す、DAX のメジャー・計算列・計算テーブルや Power Query（M）の表を書く、DAX のクエリで値を確かめる、開いている Desktop に読み直させて撮る（Desktop Bridge）、Power BI Authoring MCP（旧 Power BI Modeling MCP）やレポートの CLI を使うときに読む。手段の選び方と、変更の種類ごとの入れ方、未保存の変更を消さない守り。Power BI サービスへの発行・配置には使わない。
+description: AI から Power BI Desktop のレポートとセマンティックモデルを作る・直す・確かめるときの手順。PBIP（PBIR の JSON・TMDL）を直接直す、DAX のメジャー・計算列・計算テーブルや Power Query（M）の表を書く、DAX のクエリで値を確かめる、開いている Desktop に読み直させて撮る（Desktop Bridge）、Power BI Authoring MCP（旧 Power BI Modeling MCP）やレポートの CLI を使うときに読む。手段の選び方と、変更の種類ごとの入れ方、未保存の変更を消さない守り。Power BI サービスへの発行・配置には使わない。リポジトリに Power BI の Skill や定めがあれば、そちらが先。
 ---
 
 # AI から Power BI Desktop を操作する

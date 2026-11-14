@@ -1,6 +1,6 @@
 ---
 name: excel-read
-description: Excel（.xlsx・.xlsm・.xls・.xlsb・.ods）を読む・中身を調べる・表に整えて集計に回すとき、Power Query や VBA のコードを見るときに、使い捨てのスクリプトを書かずに、この Skill に入っている道具 excel-read で読む手順。結合セル・複数行の見出し・帳票の形の表・計算式・表示形式・隠した行も読める。Excel を書き換えるとき、式を計算し直すときには使わない。
+description: Excel（.xlsx・.xlsm・.xls・.xlsb・.ods）を読む・中身を調べる・表に整えて集計に回すとき、Power Query や VBA のコードを見るときに、使い捨てのスクリプトを書かずに、この Skill に入っている道具 excel-read で読む手順。結合セル・複数行の見出し・帳票の形の表・計算式・表示形式・隠した行も読める。Excel を書き換えるとき、式を計算し直すときには使わない。Claude に組み込みの xlsx の Skill がある環境でも、Excel を読むときはこちらに従う。
 ---
 
 # Excel を読む
