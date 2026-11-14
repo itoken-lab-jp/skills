@@ -1,0 +1,14 @@
+{
+  "files": [
+    "LICENSE",
+    "README.md",
+    "skills/japanese-writing/SKILL.md",
+    "skills/japanese-writing/references/asking-ai.md",
+    "skills/japanese-writing/references/business.md",
+    "skills/japanese-writing/references/sources.md",
+    "skills/japanese-writing/scripts/THIRD_PARTY_NOTICES.md",
+    "skills/japanese-writing/scripts/ai-words.mjs",
+    "skills/japanese-writing/scripts/check.mjs",
+    "test/japanese-writing.test.mjs"
+  ]
+}
