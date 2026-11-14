@@ -20,6 +20,7 @@
     "docs/powerbi-pbip.md",
     "docs/skill-authoring.md",
     "docs/tacit-knowledge-interview.md",
+    "docs/test-workflow.md",
     "skills/adversarial-review/SKILL.md",
     "skills/adversarial-review/references/later-rounds.md",
     "skills/adversarial-review/references/running.md",
@@ -53,6 +54,7 @@
     "skills/tacit-knowledge-interview/references/japanese-cues.md",
     "skills/tacit-knowledge-interview/references/output.md",
     "skills/tacit-knowledge-interview/references/probes.md",
+    "skills/test-workflow/SKILL.md",
     "test/excel-read.test.mjs",
     "test/japanese-writing.test.mjs",
     "test/powerbi-pbip.test.mjs",
@@ -77,6 +79,7 @@
     "tools/excel-read/make-notices.py",
     "tools/excel-read/src/main.rs",
     "tools/excel-read/src/pkg.rs",
-    "tools/pdf-read/bench.py"
+    "tools/pdf-read/bench.py",
+    "tools/test-workflow/bench_xdist.py"
   ]
 }

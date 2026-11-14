@@ -13,6 +13,7 @@
 | [powerbi-pbip](docs/powerbi-pbip.md) | Power BI Desktop のレポートとモデル（PBIP）を AI に作らせる・直させるとき。DAX・M・TMDL を書いて DAX のクエリで値を確かめ、開いている Desktop に読み直させて撮ります。未保存の変更を消さない守りつき |
 | [cold-read](docs/cold-read.md) | AI が書いた文章（README・docs・記事）を、経緯を知らない別のエージェントに読ませて、伝わらない所を見つけるとき |
 | [adversarial-review](docs/adversarial-review.md) | 変更（コード・設計・文書）の欠陥を、作った本人の意図を渡さずに別のエージェントに探させるとき。指摘の重さの決め方と、2巡目以降の打ち切り方まで |
+| [test-workflow](docs/test-workflow.md) | AI にテストを書かせる・走らせる・直させるとき。変える前に一度走らせる、直す前に赤を見る、作業中は狭く走らせる、通ったあとに実物を動かす、通すためにテストを消させない |
 | [skill-authoring](docs/skill-authoring.md) | AI に Skill（SKILL.md）を作らせる・直させるとき。Skill にするかの決め方、呼ばれる description の書き方、要約で消えない本文の置き方、呼ばれるか・従われるかの確かめ方まで |
 | [tacit-knowledge-interview](docs/tacit-knowledge-interview.md) | 人の頭の中にだけある仕事のやり方（判断の基準・例外・コツ）を、AI に本人から聞き取らせ、後任向けの手順書や SKILL.md にするとき。異動・退職の引き継ぎや、自分の仕事を Skill にするときに |
 | [judgment-lines](docs/judgment-lines.md) | AI に仕事を任せるときに、自分でやるか人に上げるか、指示に異を唱えるか、決まったら従うかの線を守らせ、報告を結論から書かせ、人の誤りを相手のやる気を壊さずに伝えさせるとき |
