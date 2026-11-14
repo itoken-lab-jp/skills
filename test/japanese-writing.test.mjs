@@ -270,6 +270,21 @@ describe('文章の形', () => {
     assert.deepEqual(shape('先方は「困るのは、納期が遅れることです。」と書いています。\n'), []);
   });
 
+  it('読み手の受け取り方と効果の見込みを言い切った文を拾い、和らげた文・事実の文・「」の中は拾わない', () => {
+    const felt = (t) => shape(t).filter((m) => m.includes('言い切っている'));
+    assert.equal(felt('「帳票の Excel の読み方」と書けば伝わります。\n').length, 1);
+    assert.equal(felt('入れれば、毎日の仕事が楽になります。\n').length, 1);
+    assert.equal(felt('見出しに対象を書けば、読み手は迷いません。\n').length, 1);
+    assert.deepEqual(felt('「帳票の Excel の読み方」と書けば伝わりやすくなります。\n'), []);
+    assert.deepEqual(felt('毎日の仕事が楽になるはずです。\n'), []);
+    assert.deepEqual(felt('3回とも、正しい単位で金額を報告しました。\n'), []);
+    assert.deepEqual(felt('先方は「これで伝わります。」と書いています。\n'), []);
+    assert.deepEqual(felt('「これで伝わります。」\n'), []);
+    assert.equal(felt('見出しに対象を書けば、読み手に伝わる。\n').length, 1);
+    assert.equal(felt('入れれば、毎日の仕事が楽になる。\n').length, 1);
+    assert.deepEqual(felt('この訳は不自然です。\n'), []);
+  });
+
   it('20 行以上で箇条書きが 3 割を超えると拾い、短い文章と箇条書きの少ない文章は拾わない', () => {
     const list = Array.from({ length: 10 }, (_, i) => `- 項目${i}を確かめる`).join('\n') + '\n';
     assert.ok(shape(fill(12) + '\n' + list).some((m) => m.includes('が箇条書き')));
