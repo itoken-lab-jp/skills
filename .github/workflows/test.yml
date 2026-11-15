@@ -37,3 +37,34 @@ jobs:
         run: node --test test/db-read.test.mjs
       - name: 試験（版の変更の一覧 tools/release-notes.mjs）
         run: node --test test/release-notes.test.mjs
+      - name: 試験（コミットの作者のメールの検査 tools/check-authors.mjs）
+        run: node --test test/check-authors.test.mjs
+
+  # push・PR で入るコミットの作者のメールが、決めたものだけかを確かめる。
+  # 推測で書いたメールは、そのメールを登録している他人のアカウントに結びつき、Contributors に出るため。
+  authors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - name: コミットの作者のメール
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          # PR では HEAD が GitHub の作る試しのマージコミットになるので、PR の先頭のコミットまでを見る
+          if [ -n "$BASE" ]; then range="$BASE..$HEAD_SHA"
+          elif [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then range="$BEFORE..HEAD"
+          else
+            # before が辿れない（新しいブランチ・force push・手で起動）ときは、push で入ったコミットの数だけ遡る（無ければ1件）
+            n=$(jq '.commits // [] | length' "$GITHUB_EVENT_PATH"); [ "$n" -ge 1 ] || n=1
+            total=$(git rev-list --count HEAD)
+            if [ "$n" -lt "$total" ]; then range="HEAD~$n..HEAD"; else range="HEAD"; fi
+          fi
+          node tools/check-authors.mjs --range "$range"
