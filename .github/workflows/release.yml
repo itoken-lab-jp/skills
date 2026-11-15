@@ -1,14 +1,27 @@
 name: release
 
-# 版のタグ（v2026.11.14・v2026.11.14.2）を push すると、前の版からの変更を Release に載せる。
+# 版のタグ（v2026.11.14・v2026.11.14.2）と、前の版からの変更を載せた Release を作る。
+# 版は急ぎでなければ1日1本にまとめる。毎晩（日本時間の3時）、main の最新に版のタグが無ければ打つ。
+# 急ぐときは Actions の画面で「Run workflow」を押す（同じことをすぐ行う）。手でタグを push しても Release を作る。
+# 版の日付は、main の最新のコミットの日（日本時間）。定時の起動は、その日がまだ終わっていない（コミットの日が今日の）ときは打たずに次の晩に回す。
+# 0時〜3時の書き出しで1日に2本にならないためと、起動が遅れて日をまたいでも前の日の変更を前の日の版にするため。
+# 試験（test・authors）が緑でないコミットには打たない。
 # 変更の説明は docs/<Skill>.md の「## 変更履歴」から tools/release-notes.mjs が集める。
+# このワークフローの token で push したタグでは、ほかのワークフローが起動しない（GitHub の仕様）ので、Release までこの中で作る。
 
 on:
   push:
     tags: ['v*']
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
+  checks: read
+
+concurrency:
+  group: release
 
 jobs:
   release:
@@ -21,20 +34,66 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
-      - name: 版の形のタグか確かめる
-        run: |
-          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]{4}\.[0-9]{2}\.[0-9]{2}(\.[0-9]+)?$ ]]; then
-            echo "::error::版の形（v2026.11.14・v2026.11.14.2）でないタグなので Release を作らない：$GITHUB_REF_NAME"
-            exit 1
-          fi
-      - name: 変更の一覧を作る
-        run: node tools/release-notes.mjs --to "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
-      - name: Release を作る（同じ版の Release があれば本文を差し替える）
+      - name: 版を決める
+        id: tag
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release edit "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md"
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            tag="$GITHUB_REF_NAME"
+            if ! [[ "$tag" =~ ^v[0-9]{4}\.[0-9]{2}\.[0-9]{2}(\.[0-9]+)?$ ]]; then
+              echo "::error::版の形（v2026.11.14・v2026.11.14.2）でないタグなので Release を作らない：$tag"
+              exit 1
+            fi
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error::版は main にだけ打つ（今は $GITHUB_REF）。"
+            exit 1
+          fi
+          sha=$(git rev-parse HEAD)
+          if git tag --points-at HEAD | grep -Eq '^v[0-9]{4}\.'; then
+            echo "main の最新（$sha）には版のタグがもうあるので、打たない。"
+            exit 0
+          fi
+          # 試験が緑かを見る（このワークフロー自身の行は除く）。走っている・赤・まだ無いなら打たない
+          runs=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/check-runs?per_page=100" \
+            --jq '[.check_runs[] | select(.name != "release")]')
+          total=$(jq length <<<"$runs")
+          bad=$(jq '[.[] | select(.conclusion != "success" and .conclusion != "skipped")] | length' <<<"$runs")
+          if [ "$total" -eq 0 ] || [ "$bad" -ne 0 ]; then
+            jq -r '.[] | "\(.name): \(.status) \(.conclusion)"' <<<"$runs"
+            msg="main の最新（$sha）の試験が緑でない（または終わっていない）ので、版を打たない。"
+            if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then echo "::error::$msg"; exit 1; fi
+            echo "::warning::$msg 次の晩にもう一度見る。"
+            exit 0
+          fi
+          day=$(TZ=Asia/Tokyo git log -1 --format=%cd --date=format-local:%Y-%m-%d HEAD)
+          if [ "$GITHUB_EVENT_NAME" = schedule ] && [ "$day" = "$(TZ=Asia/Tokyo date +%Y-%m-%d)" ]; then
+            echo "main の最新（$sha）は今日（$day）のコミットなので、次の晩に打つ。"
+            exit 0
+          fi
+          tag=$(node tools/release-notes.mjs --next --date "$day")
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "$tag" -m "$tag"
+          git push origin "refs/tags/$tag"
+          echo "版 $tag を $sha に打った。"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: 変更の一覧を作る
+        if: steps.tag.outputs.tag != ''
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: node tools/release-notes.mjs --to "$TAG" > "$RUNNER_TEMP/notes.md"
+      - name: Release を作る（同じ版の Release があれば本文を差し替える）
+        if: steps.tag.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
           else
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
+            gh release create "$TAG" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag
           fi
