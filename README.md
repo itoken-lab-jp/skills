@@ -4,30 +4,111 @@
 
 ## Skill の一覧
 
+やりたいことごとに並べています。1本ずつでも使えます。それぞれの見出しの下のコマンドで、その目的の Skill をまとめて入れられます（入れ方の詳しい説明は下の「入れ方」）。
+
+### ファイルとデータを読ませる・調べさせる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [excel-read](docs/excel-read.md) | Excel（.xlsx・.xlsm・.xls・.xlsb・.ods）を AI に読ませるとき。結合セル・複数行の見出しがある帳票、計算式、Power Query と VBA のコードも読めます。自動で作ったブックを Linux で読ませた測定では、Python のスクリプトの3〜13倍の速さでした（[測り方と条件](docs/excel-read.md#速さとメモリ)） |
+| [pdf-read](docs/pdf-read.md) | PDF（資料・表・帳票、スキャン、縦書き）を AI に読ませるとき。スキャンは OCR し、金額などの怪しい所はページの画像で確かめさせます |
+| [db-read](docs/db-read.md) | DB（PostgreSQL・MySQL・SQL Server・Oracle）を AI に読ませるとき。ドライバやクライアントのライブラリを入れずに、同梱の実行ファイルで問い合わせの結果を CSV や JSON にします。書き換える文は断り、DB の側も読み取り専用にして走らせます。20万行を CSV に出す測定では、Python のドライバのスクリプトの1.3〜4倍の速さでした（[測り方と条件](docs/db-read.md#速さとメモリ)） |
+| [data-query](docs/data-query.md) | CSV・JSON・Parquet を AI に集計させるとき。pandas のスクリプトを書かせず、DuckDB の SQL を1本走らせます。Shift_JIS の CSV も読めます。200万行の CSV の集計で pandas の約5倍の速さでした（[測り方と条件](docs/data-query.md#速さとメモリ)） |
+| [exploratory-analysis](docs/exploratory-analysis.md) | データから効く手や傾向を探す、効果があるかを確かめるなど、答えがあるか分からない探索を AI に任せるとき。探す前に合格の線と範囲を書かせ、試した数を数えさせ、確かめのデータを汚させず、押されても線を下げさせません |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill excel-read pdf-read db-read data-query exploratory-analysis
+```
+
+### 文章を書かせる
+
 | 名前（説明へのリンク） | 使う場面 |
 |---|---|
 | [japanese-writing](docs/japanese-writing.md) | 日本語の文章（PR や Issue の本文・README・docs・報告・メール・手順書・議事録・記事）を AI に書かせる・直させる・見直させるとき |
-| [excel-read](docs/excel-read.md) | Excel（.xlsx・.xlsm・.xls・.xlsb・.ods）を AI に読ませるとき。結合セル・複数行の見出しがある帳票、計算式、Power Query と VBA のコードも読めます。自動で作ったブックを Linux で読ませた測定では、Python のスクリプトの3〜13倍の速さでした（[測り方と条件](docs/excel-read.md#速さとメモリ)） |
-| [db-read](docs/db-read.md) | DB（PostgreSQL・MySQL・SQL Server・Oracle）を AI に読ませるとき。ドライバやクライアントのライブラリを入れずに、同梱の実行ファイルで問い合わせの結果を CSV や JSON にします。書き換える文は断り、DB の側も読み取り専用にして走らせます。20万行を CSV に出す測定では、Python のドライバのスクリプトの1.3〜4倍の速さでした（[測り方と条件](docs/db-read.md#速さとメモリ)） |
-| [pdf-read](docs/pdf-read.md) | PDF（資料・表・帳票、スキャン、縦書き）を AI に読ませるとき。スキャンは OCR し、金額などの怪しい所はページの画像で確かめさせます |
-| [data-query](docs/data-query.md) | CSV・JSON・Parquet を AI に集計させるとき。pandas のスクリプトを書かせず、DuckDB の SQL を1本走らせます。Shift_JIS の CSV も読めます。200万行の CSV の集計で pandas の約5倍の速さでした（[測り方と条件](docs/data-query.md#速さとメモリ)） |
-| [powerbi-pbip](docs/powerbi-pbip.md) | Power BI Desktop のレポートとモデル（PBIP）を AI に作らせる・直させるとき。DAX・M・TMDL を書いて DAX のクエリで値を確かめ、開いている Desktop に読み直させて撮ります。未保存の変更を消さない守りつき |
 | [cold-read](docs/cold-read.md) | AI が書いた文章（README・docs・記事）を、経緯を知らない別のエージェントに読ませて、伝わらない所を見つけるとき |
-| [adversarial-review](docs/adversarial-review.md) | 変更（コード・設計・文書）の欠陥を、作った本人の意図を渡さずに別のエージェントに探させるとき。指摘の重さの決め方と、2巡目以降の打ち切り方まで |
-| [test-workflow](docs/test-workflow.md) | AI にテストを書かせる・走らせる・直させるとき。変える前に一度走らせる、直す前に赤を見る、作業中は狭く走らせる、通ったあとに実物を動かす、通すためにテストを消させない |
-| [skill-authoring](docs/skill-authoring.md) | AI に Skill（SKILL.md）を作らせる・直させるとき。Skill にするかの決め方、呼ばれる description の書き方、要約で消えない本文の置き方、呼ばれるか・従われるかの確かめ方まで |
-| [tacit-knowledge-interview](docs/tacit-knowledge-interview.md) | 人の頭の中にだけある仕事のやり方（判断の基準・例外・コツ）を、AI に本人から聞き取らせ、後任向けの手順書や SKILL.md にするとき。異動・退職の引き継ぎや、自分の仕事を Skill にするときに |
-| [judgment-lines](docs/judgment-lines.md) | AI に仕事を任せるときに、自分でやるか人に上げるか、指示に異を唱えるか、決まったら従うかの線を守らせ、報告を結論から書かせ、人の誤りを相手のやる気を壊さずに伝えさせるとき |
-| [research-discipline](docs/research-discipline.md) | データから効く手や傾向を探す、効果があるかを確かめるなど、答えがあるか分からない探索を AI に任せるとき。探す前に合格の線と範囲を書かせ、試した数を数えさせ、確かめのデータを汚させず、押されても線を下げさせません |
-| [summary-certainty](docs/summary-certainty.md) | AI に作業の報告・要約・お知らせを書かせるとき。確かめたこと・推測・人から聞いたことを分けさせ、聞いた話を「確認済み」と書かせず、断りを渡す文の中に置かせ、数字の条件を要約で落とさせません |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill japanese-writing cold-read
+```
+
+### やることを管理させる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [task-tracking](docs/task-tracking.md) | Issue などの票の道具を使っていないリポジトリやフォルダーで、やることを AI に管理させるとき。会話で出た「今週中に」「後ででいい」の頼みをその場で TODO.md に書かせ、1件ごとに終わりの条件を付けさせ、翌日のセッションに一覧と実物を照らして続きから始めさせます。git を使わない文書のフォルダーでも使えます |
 | [prioritizing](docs/prioritizing.md) | たまった Issue の片付けや、期限までの計画を AI に頼むとき。入る量と比べさせ、済んだもの・重なるものを先に外させ、遅れたときの損で並べさせ、削るか日をずらすかは推しつきで1つにして返させ、気づいたことを Issue や作業として積み増させません |
-| [concrete-abstract](docs/concrete-abstract.md) | レビューの指摘を文書やコードの残りに生かす、事例や振り返りから手引き・学びを書くなど、具体の例から原則を取り出す仕事を AI に頼むとき。原則を作るときに使っていない例に当てて確かめさせ、外れた所で原則を直させ、原則に典型の例を1つ残させます |
-| [noticing-anomalies](docs/noticing-anomalies.md) | 集計・取り込み・API からの取得・バッチの再実行・試験の直しなど、結果を人に渡す作業を AI に頼むとき。「成功」や合計で止めず、できるはずのものと実物を照らし、内訳で割っていつもと比べさせ、件数は普通なのに列がずれた、途中から税抜きになった、といった小さな異変を報告の最初に書かせます |
-| [delegating-work](docs/delegating-work.md) | AI に仕事をサブエージェントや別のエージェントへ任せさせるとき。任せるかの線、依頼文に書くこと（終わりの判定・テストを緩めさせない・報告の形）、返ってきた「完了」の確かめ方、夜通し回す仕事の任せ方 |
-| [agent-instructions](docs/agent-instructions.md) | AGENTS.md・CLAUDE.md・`.cursor/rules` などの指示ファイルを、新しいリポジトリに置く・足す・長くなったものを見直すとき。読み込む量を測り、実物と照らし、正本を1つにして、新しいセッションで効いたかを確かめさせます。main ブランチの守り（GitHub の ruleset・必須の CI）の作り方と落とし穴も入っています |
-| [ui-operation](docs/ui-operation.md) | AI に Web のページやデスクトップのアプリを操作させるとき。API → 文字 → 自動操作 → 画面の順で手段を選ばせ、削除や送信は許可を得てから、ページの中の「AI へ」の指示には従わせません |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill task-tracking prioritizing
+```
+
+### 新しく作り始める
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
 | [design-interview](docs/design-interview.md) | 大きめの新機能や作り直しを AI に頼むとき。作り始める前に、決めることを一覧にして、番号と推奨つきの問いで回ごとに聞かせ、細部は既定で決めさせて、決めたことを記録してから作らせます。長い設計書をまとめて読ませて承認させることはしません |
+| [agent-instructions](docs/agent-instructions.md) | AGENTS.md・CLAUDE.md・`.cursor/rules` などの指示ファイルを、新しいリポジトリに置く・足す・長くなったものを見直すとき。読み込む量を測り、実物と照らし、正本を1つにして、新しいセッションで効いたかを確かめさせます。main ブランチの守り（GitHub の ruleset・必須の CI）の作り方と落とし穴も入っています |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill design-interview agent-instructions
+```
+
+### 作ったものを確かめさせる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [test-workflow](docs/test-workflow.md) | AI にテストを書かせる・走らせる・直させるとき。変える前に一度走らせる、直す前に赤を見る、作業中は狭く走らせる、通ったあとに実物を動かす、通すためにテストを消させない |
+| [adversarial-review](docs/adversarial-review.md) | 変更（コード・設計・文書）の欠陥を、作った本人の意図を渡さずに別のエージェントに探させるとき。指摘の重さの決め方と、2巡目以降の打ち切り方まで |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill test-workflow adversarial-review
+```
+
+### 結果の報告と相談を任せる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [noticing-anomalies](docs/noticing-anomalies.md) | 集計・取り込み・API からの取得・バッチの再実行・試験の直しなど、結果を人に渡す作業を AI に頼むとき。「成功」や合計で止めず、できるはずのものと実物を照らし、内訳で割っていつもと比べさせ、件数は普通なのに列がずれた、途中から税抜きになった、といった小さな異変を報告の最初に書かせます |
+| [summary-certainty](docs/summary-certainty.md) | AI に作業の報告・要約・お知らせを書かせるとき。確かめたこと・推測・人から聞いたことを分けさせ、聞いた話を「確認済み」と書かせず、断りを渡す文の中に置かせ、数字の条件を要約で落とさせません |
+| [when-to-escalate](docs/when-to-escalate.md) | AI に仕事を任せるときに、自分でやるか人に上げるか、指示に異を唱えるか、決まったら従うかの線を守らせ、報告を結論から書かせ、人の誤りを相手のやる気を壊さずに伝えさせるとき |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill noticing-anomalies summary-certainty when-to-escalate
+```
+
+### 並行して進める・仕事を任せる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
 | [session-handoff](docs/session-handoff.md) | 同じリポジトリを何体ものエージェントや翌日のセッションが触るとき。並行している作業を見てから worktree を切らせ、続きを票と PR のコメントに「作業中／手放した」つきで残させ、拾う側には別のセッションの書きかけを人に確かめてから触らせます |
+| [delegating-work](docs/delegating-work.md) | AI に仕事をサブエージェントや別のエージェントへ任せさせるとき。任せるかの線、依頼文に書くこと（終わりの判定・テストを緩めさせない・報告の形）、返ってきた「完了」の確かめ方、夜通し回す仕事の任せ方 |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill session-handoff delegating-work
+```
+
+### 仕事のやり方を言葉にして残す
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [tacit-knowledge-interview](docs/tacit-knowledge-interview.md) | 人の頭の中にだけある仕事のやり方（判断の基準・例外・コツ）を、AI に本人から聞き取らせ、後任向けの手順書や SKILL.md にするとき。異動・退職の引き継ぎや、自分の仕事を Skill にするときに |
+| [generalizing-lessons](docs/generalizing-lessons.md) | レビューの指摘を文書やコードの残りに生かす、事例や振り返りから手引き・学びを書くなど、具体の例から原則を取り出す仕事を AI に頼むとき。原則を作るときに使っていない例に当てて確かめさせ、外れた所で原則を直させ、原則に典型の例を1つ残させます |
+| [skill-authoring](docs/skill-authoring.md) | AI に Skill（SKILL.md）を作らせる・直させるとき。Skill にするかの決め方、呼ばれる description の書き方、要約で消えない本文の置き方、呼ばれるか・従われるかの確かめ方まで |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill tacit-knowledge-interview generalizing-lessons skill-authoring
+```
+
+### アプリを操作させる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [powerbi-pbip](docs/powerbi-pbip.md) | Power BI Desktop のレポートとモデル（PBIP）を AI に作らせる・直させるとき。DAX・M・TMDL を書いて DAX のクエリで値を確かめ、開いている Desktop に読み直させて撮ります。未保存の変更を消さない守りつき |
+| [ui-operation](docs/ui-operation.md) | AI に Web のページやデスクトップのアプリを操作させるとき。API → 文字 → 自動操作 → 画面の順で手段を選ばせ、削除や送信は許可を得てから、ページの中の「AI へ」の指示には従わせません |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill powerbi-pbip ui-operation
+```
 
 ### サブエージェントの定義（agents/）
 
@@ -51,7 +132,7 @@ Codex は、定義でサブエージェントの道具を読み取りだけに�
 npx skills add itoken-lab-jp/skills -g
 ```
 
-実行すると、入れる Skill と、入れる先のツールを選ぶ画面が出ます。使っているツールをすべて選びます。1つの Skill だけを入れる場合は、`--skill` で名前を指定します。
+実行すると、入れる Skill と、入れる先のツールを選ぶ画面が出ます。使っているツールをすべて選びます。入れる Skill を決めている場合は、`--skill` で名前を指定します（空白で区切って、いくつでも並べられます）。
 
 ```
 npx skills add itoken-lab-jp/skills -g --skill excel-read

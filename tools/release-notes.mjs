@@ -72,6 +72,14 @@ export function collect(repo, from, to) {
   const before = skillsAt(repo, from);
   const added = now.filter((n) => !before.includes(n));
   const removed = before.filter((n) => !now.includes(n));
+  // 改名した Skill は「外した＋足した」に見える。足した Skill の変更履歴のうち、移行が要る行は必ず出す。
+  // 外した Skill の前の版の変更履歴と同じ行を持つものは改名と見て、前の版に無かった行を全部出す（改名と同じ版に入った中身の変更を落とさない）
+  const removedLogs = new Set(removed.flatMap((n) => changelogOf(docAt(repo, from, n))));
+  const addedChanges = added.map((name) => {
+    const log = changelogOf(docAt(repo, to, name));
+    const renamed = log.some((e) => removedLogs.has(e));
+    return { name, entries: log.filter((e) => !removedLogs.has(e) && (renamed || body(e).startsWith(MIGRATION))) };
+  }).filter((x) => x.entries.length);
   const changed = [];
   const undocumented = [];
   for (const name of now.filter((n) => before.includes(n))) {
@@ -81,7 +89,7 @@ export function collect(repo, from, to) {
     if (entries.length) changed.push({ name, entries });
     else if (diff) undocumented.push(name);
   }
-  return { first: false, added, removed, changed, undocumented };
+  return { first: false, added, removed, changed: [...addedChanges, ...changed], undocumented };
 }
 
 // 「2026-11-14：本文」の日付を外す（Release は版ごとなので日付は要らない）

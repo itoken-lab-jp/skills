@@ -104,6 +104,24 @@ describe('変更の一覧', () => {
     assert.match(r.out, /itoken-lab-jp\/skills@v2026\.11\.14 -g/);
   });
 
+  it('改名した Skill（前の名前が消え、新しい名前が増える）の移行の行は、移行が要る変更に出す', () => {
+    const dir = fakeRepo();
+    commit(dir, { 'skills/old/SKILL.md': 'x', 'docs/old.md': doc('2026-11-01：最初') }, 'v2026.11.01');
+    commit(dir, {
+      'skills/old': null, 'docs/old.md': null, 'skills/renamed/SKILL.md': 'x',
+      'docs/renamed.md': doc('2026-11-01：最初', '2026-11-14：手順を書き直した', '2026-11-14：【移行が要る】名前を old から renamed に変えた'),
+      'skills/brandnew/SKILL.md': 'n', 'docs/brandnew.md': doc('2026-11-14：公開', '2026-11-14：【移行が要る】別の Skill から分けた'),
+    }, 'v2026.11.14');
+    const r = call(['--repo', dir, '--to', 'v2026.11.14', '--strict']);
+    assert.equal(r.code, 0, r.err);
+    assert.match(r.out, /## 移行が要る変更[\s\S]*\[renamed\]\([^)]*\)：名前を old から renamed に変えた[\s\S]*## 足した Skill/);
+    assert.doesNotMatch(r.out, /最初$/m, '前の名前のときに出した行は出さない');
+    assert.match(r.out, /## 変えた Skill[\s\S]*\[renamed\]\([^)]*\)：手順を書き直した/, '改名と同じ版の中身の変更は出す');
+    assert.match(r.out, /## 移行が要る変更[\s\S]*\[brandnew\]\([^)]*\)：別の Skill から分けた/, '新しい Skill の移行の行は出す');
+    assert.doesNotMatch(r.out, /：公開$/m, '新しい Skill の移行でない行は出さない');
+    assert.match(r.out, /- old/);
+  });
+
   it('--to が版のタグなら、その前の版から比べる（同じコミットに付いた別のタグは飛ばす）', () => {
     const dir = fakeRepo();
     commit(dir, { 'skills/a/SKILL.md': 'a1', 'docs/a.md': doc() }, 'v2026.11.01');
