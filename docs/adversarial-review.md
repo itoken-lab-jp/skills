@@ -24,3 +24,7 @@ npx skills add itoken-lab-jp/skills -g --skill adversarial-review
 ```
 
 手順の本文は [SKILL.md](../skills/adversarial-review/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-15：報告にこの Skill の中の事情（敵対レビューを回したか、どの条件に当たったか）を書かない、を足した。
