@@ -55,9 +55,10 @@ npx skills add itoken-lab-jp/skills -g --skill japanese-writing cold-read
 |---|---|
 | [task-tracking](docs/task-tracking.md) | Issue などの票の道具を使っていないリポジトリやフォルダーで、やることを AI に管理させるとき。会話や議事録で出た「今週中に」「後ででいい」の頼みをその場で TODO.md に書かせ、1件ごとに終わりの条件を付けさせ、翌日のセッションに一覧と実物を照らして続きから始めさせます。git を使わない文書のフォルダーでも使えます |
 | [prioritizing](docs/prioritizing.md) | たまった Issue の片付けや、期限までの計画を AI に頼むとき。入る量と比べさせ、済んだもの・重なるものを先に外させ、遅れたときの損で並べさせ、削るか日をずらすかは推しつきで1つにして返させ、気づいたことを Issue や作業として積み増させません |
+| [ticket-writing](docs/ticket-writing.md) | 仕様や会話を、作業の票（Issue・チケット）に AI に書かせる・分けさせるとき。元の票のコメントと作業中の PR、コードを読んでから書かせ、覆った決定は最後の形で書かせます。DB・API・画面の層ごとでなく、それだけで動きを確かめられる単位に分けさせ、順と済んだと言える条件を書かせ、決まっていないことは決めずに待ちの票にさせます。全体に及ぶ改名は、止めずに出せる「足す・移す・消す」の順にさせます |
 
 ```
-npx skills add itoken-lab-jp/skills -g --skill task-tracking prioritizing
+npx skills add itoken-lab-jp/skills -g --skill task-tracking prioritizing ticket-writing
 ```
 
 ### 新しく作り始める
