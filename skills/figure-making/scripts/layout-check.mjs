@@ -2,6 +2,14 @@
 // SVG・HTML の図やスライド、Mermaid の図をブラウザ（Chrome・Edge・Chromium）で描き、PNG にして、
 // 文字の重なり・はみ出し・線が文字を通る所・小さい文字を数えて出す。Mermaid は構文エラーも出す。
 // 使い方: node layout-check.mjs <図.svg | 図.html | 図.mmd | 文書.md> [--width 1280] [--height 720] [--out 図.png] [--min-font 12] [--pdf 図.pdf] [--mermaid <mermaid.min.js の場所か URL>] [--json]
+//         node layout-check.mjs <スライド.pptx> [--min-font 14] [--pdf 確かめ用.pdf] [--json]
+//   .pptx は、中身（XML）からスライドの外に出た部品・箱に入りきらない見込みの文字・下に伸びる表・小さい文字（pt）・日本語のフォントの指定もれを出し、
+//   Windows に PowerPoint があれば PowerPoint に（窓を出さずに）、無ければ LibreOffice に PDF とスライドごとの PNG を書き出させ、
+//   描いた結果の文字の行の位置（PowerPoint が返す値か、PDF を pdftotext で読んだ値）から、文字どうしの重なり・箱からあふれた文字・
+//   スライドの外で切れた文字を実測で出す（見積もりの指摘は実測に置き換わる）。
+//   全部を並べた一覧の画像も作って場所を出す（LibreOffice のときの PNG には pdftoppm が、一覧の画像には Chrome・Edge・Chromium が要る。無ければ、ある物だけを出す）。
+//   PowerPoint を使わせないときは LAYOUT_CHECK_NO_POWERPOINT=1、描かずに中身からの指摘だけを出すときは LAYOUT_CHECK_NO_RENDER=1。
+//   LibreOffice の場所は LAYOUT_CHECK_SOFFICE でも指定できる。
 //   確かめ用の PNG は一時フォルダーに出し、場所を出力に書く（渡す PNG を作るときは --out）。
 //   .md は、中の ```mermaid のブロックを1つずつ描く（PNG は <名前>-mermaid-1.png …）。
 // 依存: Node 22 以上と、Chrome・Edge・Chromium のどれか（npm の依存は無い）。ブラウザの場所は LAYOUT_CHECK_BROWSER でも指定できる。
@@ -9,11 +17,12 @@
 //   無ければ CDN（cdn.jsdelivr.net）から読む（図の中身は外に送らない。読むのはライブラリだけ）。
 //   Linux のコンテナや CI でブラウザがサンドボックスを使えずに起動しないときは、LAYOUT_CHECK_NO_SANDBOX=1 を付ける（root では自動で付く）。
 // 終了コード: 0 = 指摘なし、1 = 指摘あり（構文エラーを含む）、2 = 走らせられなかった（ブラウザが無い、ファイルが読めない）。
-import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync, mkdtempSync, mkdirSync, rmSync, readdirSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { inflateRawSync } from 'node:zlib';
+import { readFileSync, writeFileSync, existsSync, mkdtempSync, mkdirSync, rmSync, readdirSync, copyFileSync } from 'node:fs';
 import { join, resolve, dirname, extname, basename } from 'node:path';
 import { tmpdir, homedir, platform } from 'node:os';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
 // ---- ブラウザの中で走る検査（文字列にして送るので、外の変数を使わない） ----
@@ -200,14 +209,14 @@ function findBrowser() {
 }
 
 function parseArgs(argv) {
-  const o = { width: 1280, height: 720, minFont: 12, pad: 0, json: false };
+  const o = { width: 1280, height: 720, minFont: 12, minFontGiven: false, pad: 0, json: false };
   const rest = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--json') o.json = true;
     else if (a === '--width') o.width = Number(argv[++i]);
     else if (a === '--height') o.height = Number(argv[++i]);
-    else if (a === '--min-font') o.minFont = Number(argv[++i]);
+    else if (a === '--min-font') { o.minFont = Number(argv[++i]); o.minFontGiven = true; }
     else if (a === '--pad') o.pad = Number(argv[++i]);
     else if (a === '--out') o.out = argv[++i];
     else if (a === '--pdf') o.pdf = argv[++i];
@@ -235,12 +244,281 @@ function findMermaid(o, file) {
 }
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
+// ---- .pptx：中身（XML）から測り、LibreOffice で PDF と画像にする ----
+function unzip(buf) {
+  const files = new Map();
+  const e = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  if (e < 0) throw new Error('zip として読めない（.pptx が壊れている）');
+  const n = buf.readUInt16LE(e + 10);
+  let p = buf.readUInt32LE(e + 16);
+  for (let i = 0; i < n; i++) {
+    if (buf.readUInt32LE(p) !== 0x02014b50) throw new Error('zip の目次が壊れている');
+    const method = buf.readUInt16LE(p + 10), csize = buf.readUInt32LE(p + 20), nl = buf.readUInt16LE(p + 28), xl = buf.readUInt16LE(p + 30), cl = buf.readUInt16LE(p + 32), lho = buf.readUInt32LE(p + 42);
+    const name = buf.toString('utf8', p + 46, p + 46 + nl);
+    const start = lho + 30 + buf.readUInt16LE(lho + 26) + buf.readUInt16LE(lho + 28);
+    const data = buf.subarray(start, start + csize);
+    if (/\.(xml|rels)$/.test(name)) files.set(name, (method === 0 ? data : inflateRawSync(data)).toString('utf8'));
+    p += 46 + nl + xl + cl;
+  }
+  return files;
+}
+function findSoffice() {
+  const cands = [];
+  if (process.env.LAYOUT_CHECK_SOFFICE) cands.push(process.env.LAYOUT_CHECK_SOFFICE);
+  const os = platform();
+  if (os === 'win32') for (const base of [process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']].filter(Boolean)) cands.push(join(base, 'LibreOffice', 'program', 'soffice.exe'));
+  else if (os === 'darwin') cands.push('/Applications/LibreOffice.app/Contents/MacOS/soffice');
+  for (const dir of (process.env.PATH || '').split(os === 'win32' ? ';' : ':')) for (const n of os === 'win32' ? ['soffice.exe'] : ['soffice', 'libreoffice']) cands.push(join(dir, n));
+  return cands.find((c) => c && existsSync(c)) || null;
+}
+function checkPptx(file, o, fail) {
+  const PT = 12700;
+  const minFont = o.minFontGiven ? o.minFont : 14;
+  let z;
+  try { z = unzip(readFileSync(file)); } catch (e) { fail(`走らせられなかった: ${e.message}`); }
+  const pres = z.get('ppt/presentation.xml'), rels = z.get('ppt/_rels/presentation.xml.rels');
+  if (!pres || !rels) fail('走らせられなかった: ppt/presentation.xml が無い（.pptx が壊れている）');
+  const attr = (tag, name) => (tag.match(new RegExp(`\\s${name}="([^"]*)"`)) || [])[1];
+  const sz = pres.match(/<p:sldSz[^>]*>/)?.[0] || '';
+  const W = Number(attr(sz, 'cx') || 12192000), H = Number(attr(sz, 'cy') || 6858000);
+  const target = new Map([...rels.matchAll(/<Relationship\b[^>]*>/g)].map((m) => [attr(m[0], 'Id'), attr(m[0], 'Target')]));
+  const slides = [...pres.matchAll(/<p:sldId\b[^>]*>/g)].map((m) => target.get(attr(m[0], 'r:id'))).filter(Boolean).map((t) => 'ppt/' + t.replace(/^\/ppt\//, '').replace(/^\.\//, ''));
+  const dec = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  const short = (s) => { const t = s.replace(/\s+/g, ' ').trim(); return t.length > 18 ? t.slice(0, 18) + '…' : t; };
+  // 全角は文字の大きさと同じ幅、半角はその 0.55 倍で数える（見積もり）
+  const widthPt = (s, size) => { let w = 0; for (const c of s) w += /[\u1100-\u11ff\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff\uff00-\uff60\uffe0-\uffe6]/.test(c) ? size : size * 0.55; return w; };
+  const paras = (xml) => [...xml.matchAll(/<a:p>([\s\S]*?)<\/a:p>|<a:p\s[^>]*>([\s\S]*?)<\/a:p>/g)].map((m) => {
+    const body = m[1] ?? m[2];
+    const text = [...body.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((t) => dec(t[1])).join('');
+    // 文字のある run ごとの大きさ。収まりの見積もりには段落でいちばん大きいものを、小さい文字の検査にはいちばん小さいものを使う
+    const runs = [...body.matchAll(/<a:r>([\s\S]*?)<\/a:r>/g)].map((r) => ({ text: dec([...r[1].matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((t) => t[1]).join('')), size: Number(attr(r[1].match(/<a:rPr\b[^>]*>/)?.[0] || '', 'sz') || 0) / 100 })).filter((r) => r.text.trim() && r.size);
+    return { text, size: runs.length ? Math.max(...runs.map((r) => r.size)) : null, runs };
+  }).filter((p) => p.text.trim());
+  const needH = (ps, wPt) => ps.reduce((h, p) => h + Math.max(1, Math.ceil(widthPt(p.text, p.size ?? 18) / Math.max(wPt, 1))) * (p.size ?? 18) * 1.2, 0);
+  const xfrm = (xml) => { const off = xml.match(/<a:off\b[^>]*>/)?.[0], ext = xml.match(/<a:ext\b[^>]*\bcx="[^>]*>/)?.[0]; return off && ext ? { x: Number(attr(off, 'x')), y: Number(attr(off, 'y')), w: Number(attr(ext, 'cx')), h: Number(attr(ext, 'cy')) } : null; };
+  const issues = [], perSlide = [], groupedSlides = [];
+  const norm = (t) => t.normalize('NFKC').replace(/\s+/g, '');
+  const boxes = new Map(), slideText = new Map(); // スライドごとの、文字のある図形の箱（pt）と、全部の文字。描いた結果と照らすのに使う
+  const add = (slide, kind, msg, est) => { if (issues.length < 80 && !issues.some((i) => i.msg === `スライド ${slide}：${msg}`)) issues.push({ slide, kind, msg: `スライド ${slide}：${msg}`, ...(est ? { estimated: true } : {}) }); };
+  slides.forEach((name, idx) => {
+    const n = idx + 1, xml = z.get(name) || '';
+    // まとめた図形（グループ）の中は、座標の基準が変わるので位置を見ない（文字の大きさは見る）。グループの外の図形は見る
+    let top = xml, inGroups = '';
+    for (let m; (m = top.match(/<p:grpSp>(?:(?!<p:grpSp>)[\s\S])*?<\/p:grpSp>/));) { inGroups += m[0].replace(/<\/?p:grpSp>/g, ''); top = top.replace(m[0], ''); }
+    if (inGroups) groupedSlides.push(n);
+    const fonts = new Set();
+    let grouped = false;
+    boxes.set(n, []);
+    slideText.set(n, norm([...xml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((t) => dec(t[1])).join('')));
+    for (const m of (top + '<!--grp-->' + inGroups).matchAll(/<p:(sp|pic|graphicFrame)>[\s\S]*?<\/p:\1>|<!--grp-->/g)) {
+      if (m[0] === '<!--grp-->') { grouped = true; continue; }
+      const el = m[0], b = xfrm(el);
+      const tbl = el.includes('<a:tbl>');
+      const ps = tbl ? [] : paras(el);
+      const label = ps.length ? `「${short(ps.map((p) => p.text).join(' '))}」` : tbl ? '表' : m[1] === 'pic' ? '画像' : '図形';
+      for (const p of paras(el)) for (const r of p.runs) { fonts.add(r.size); if (r.size < minFont) add(n, 'small', `小さい文字 ${r.size}pt：「${short(r.text)}」（${minFont}pt より小さい）`); }
+      if (!b || grouped) continue;
+      if (ps.length) {
+        // 塗りか枠線のある図形だけ、文字が箱からあふれると見た目が崩れる（塗りの無い文字の箱は、あふれても見えない）
+        const spPr = el.match(/<p:spPr[\s\S]*?<\/p:spPr>/)?.[0] || '';
+        const filled = !/<p:cNvSpPr[^>]*txBox="1"/.test(el) ? !/^<p:spPr[^>]*>(?:(?!<a:ln)[\s\S])*<a:noFill\/>/.test(spPr) || /<a:ln\b[^>]*>\s*<a:solidFill/.test(spPr) : /<a:(solidFill|gradFill|pattFill)/.test(spPr);
+        boxes.get(n).push({ x0: b.x / PT, y0: b.y / PT, x1: (b.x + b.w) / PT, y1: (b.y + b.h) / PT, text: norm(ps.map((p) => p.text).join('')), filled, label });
+      }
+      if (b.x < -PT || b.y < -PT || b.x + b.w > W + PT || b.y + b.h > H + PT) add(n, 'outside', `スライドの外に出ている：${label}（左 ${Math.round(b.x / PT)}pt、上 ${Math.round(b.y / PT)}pt、幅 ${Math.round(b.w / PT)}pt、高さ ${Math.round(b.h / PT)}pt。スライドは ${Math.round(W / PT)}×${Math.round(H / PT)}pt）`);
+      if (tbl) {
+        const cols = [...el.matchAll(/<a:gridCol\b[^>]*>/g)].map((c) => Number(attr(c[0], 'w')) / PT);
+        let total = 0;
+        for (const tr of el.matchAll(/<a:tr\b([^>]*)>([\s\S]*?)<\/a:tr>/g)) {
+          let rh = Number(attr(' ' + tr[1], 'h') || 0) / PT;
+          [...tr[2].matchAll(/<a:tc\b[^>]*>[\s\S]*?<\/a:tc>|<a:tc\b[^>]*\/>/g)].forEach((tc, ci) => { const cps = paras(tc[0]); if (cps.length) rh = Math.max(rh, needH(cps, (cols[ci] ?? 100) - 14.4) + 7.2); });
+          total += rh;
+        }
+        if (b.y / PT + total > H / PT + 4) add(n, 'outside', `表がスライドの下に出る見込み（文字が折り返して行が伸びる。表の高さ 約${Math.round(total)}pt、置いた所から下端まで ${Math.round((H - b.y) / PT)}pt）`, true);
+      } else if (ps.length && ps.every((p) => p.size) && b.h > 0) {
+        const bp = el.match(/<a:bodyPr\b[^>]*>/)?.[0] || '';
+        if (attr(bp, 'vert') && attr(bp, 'vert') !== 'horz') continue;
+        const ins = (k) => Number(attr(bp, k) ?? 91440) / PT;
+        const need = attr(bp, 'wrap') === 'none' ? ps.reduce((h, p) => h + p.size * 1.2, 0) : needH(ps, b.w / PT - ins('lIns') - ins('rIns'));
+        if (need > (b.h / PT) * 1.15 + 6) add(n, 'overflow', `文字が箱に入りきらない見込み：${label}（要る高さ 約${Math.round(need)}pt、箱 ${Math.round(b.h / PT)}pt。PowerPoint の箱は、文字が増えても自動では広がらない）`, true);
+        if (attr(bp, 'wrap') === 'none' && b.x / PT + Math.max(...ps.map((p) => widthPt(p.text, p.size))) > W / PT + 4) add(n, 'outside', `折り返さない文字がスライドの右に出る見込み：${label}`, true);
+      }
+    }
+    // 日本語の文字は、東アジアの側（a:ea）のフォントで描かれる。a:ea が無いと、テーマの ea のフォントになる（テーマの ea が空のときだけ a:latin が使われる。2026-11 に PowerPoint の実機で確かめた）
+    const noEa = [...xml.matchAll(/<a:r>([\s\S]*?)<\/a:r>/g)].find((r) => /<a:latin\b/.test(r[1]) && !/<a:ea\b/.test(r[1]) && /[\u3040-\u30ff\u4e00-\u9fff]/.test(r[1].replace(/<[^>]*>/g, '')));
+    if (noEa) add(n, 'font', `日本語の文字に、欧文の側（a:latin）のフォントしか指定が無い：「${short(dec(noEa[1].replace(/<[^>]*>/g, '')))}」ほか。PowerPoint は日本語を東アジアの側（a:ea）のフォントで描き、a:ea が無いとテーマの東アジアのフォント（日本語版の Office のテーマなら游ゴシックなど）になることがある。a:ea にも同じ名前を入れる。`);
+    perSlide.push({ slide: n, fontsPt: [...fonts].sort((a, b) => b - a) });
+  });
+  // 描く
+  const outDir = join(tmpdir(), 'layout-check', createHash('sha1').update(file).digest('hex').slice(0, 8));
+  rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(outDir, { recursive: true });
+  let pdf = null, pngs = [], note = null, by = null, pptErr = '';
+  const made = join(outDir, basename(file).replace(/\.[^.]+$/, '') + '.pdf');
+  const countPages = (f) => (readFileSync(f).toString('latin1').match(/\/Type\s*\/Page\b(?!s)/g) || []).length;
+  const listPngs = () => readdirSync(outDir).filter((f) => /^slide-\d+\.png$/.test(f)).sort((a, b) => parseInt(a.slice(6)) - parseInt(b.slice(6))).map((f) => join(outDir, f));
+  // Windows に PowerPoint があれば、PowerPoint 自身に書き出させる（窓は出さない）。これが一番確か
+  const noRender = !!process.env.LAYOUT_CHECK_NO_RENDER; // 描かずに、中身からの指摘だけを出す（試験用）
+  if (platform() === 'win32' && !process.env.LAYOUT_CHECK_NO_POWERPOINT && !noRender) {
+    const ps1 = join(outDir, 'export.ps1');
+    writeFileSync(ps1, '﻿' + [
+      'param([string]$File, [string]$Pdf, [string]$Dir)',
+      "$ErrorActionPreference = 'Stop'",
+      '# すでに PowerPoint が動いていれば、その PowerPoint につながる。その場合は、使っている人の PowerPoint を終了させない',
+      '$wasRunning = @(Get-Process POWERPNT -ErrorAction SilentlyContinue).Count -gt 0',
+      '$out = New-Object System.Collections.ArrayList',
+      '$script:cell = 0',
+      '# 表のセルの行の位置は、セルの左上からの値で返る（2026-11-15 に Windows の PowerPoint で確かめた）ので、セルの位置を足す',
+      'function Add-Frame($sl, $shape, $id, $filled, $rel) {',
+      '  try { $dx = 0; $dy = 0; if ($rel) { $dx = $shape.Left; $dy = $shape.Top }; foreach ($ln in $shape.TextFrame.TextRange.Lines()) { $t = $ln.Text.Trim(); if ($t) { [void]$out.Add(@{ s = $sl; id = $id; x = $ln.BoundLeft + $dx; y = $ln.BoundTop + $dy; w = $ln.BoundWidth; h = $ln.BoundHeight; text = $t; sx = $shape.Left; sy = $shape.Top; sw = $shape.Width; sh = $shape.Height; filled = [bool]$filled }) } } } catch {}',
+      '}',
+      'function Add-Lines($sl, $shape) {',
+      '  try {',
+      '    if ($shape.Type -eq 6) { foreach ($g in $shape.GroupItems) { Add-Lines $sl $g }; return }',
+      '    if ($shape.HasTable -eq -1) { foreach ($row in $shape.Table.Rows) { foreach ($c in $row.Cells) { $script:cell++; Add-Frame $sl $c.Shape ("cell" + $script:cell) $false $true } }; return }',
+      '    if ($shape.HasTextFrame -eq -1 -and $shape.TextFrame.HasText -eq -1) { Add-Frame $sl $shape ("" + $shape.Id) (($shape.Fill.Visible -eq -1) -or ($shape.Line.Visible -eq -1)) $false }',
+      '  } catch {}',
+      '}',
+      '$app = New-Object -ComObject PowerPoint.Application',
+      'try {',
+      '  $pres = $app.Presentations.Open($File, -1, 0, 0)  # ReadOnly, Untitled なし, 窓なし',
+      '  try {',
+      '    $pres.SaveAs($Pdf, 32)  # ppSaveAsPDF',
+      '    $w = 1280; $h = [int][math]::Round(1280 * $pres.PageSetup.SlideHeight / $pres.PageSetup.SlideWidth)',
+      '    foreach ($s in $pres.Slides) { $s.Export((Join-Path $Dir ("slide-" + $s.SlideIndex + ".png")), "PNG", $w, $h) }',
+      '    # 文字の行ごとの、描かれた位置と大きさ（pt）。重なりとあふれを、見積もりでなく実測で出すのに使う',
+      '    foreach ($s in $pres.Slides) { foreach ($shape in $s.Shapes) { Add-Lines $s.SlideIndex $shape } }',
+      '    $json = if ($out.Count) { ConvertTo-Json -InputObject @($out) -Depth 3 -Compress } else { "[]" }',
+      '    [IO.File]::WriteAllText((Join-Path $Dir "lines.json"), $json, (New-Object Text.UTF8Encoding($false)))',
+      '  } finally { $pres.Close(); [void][Runtime.InteropServices.Marshal]::ReleaseComObject($pres) }',
+      '} finally { if (-not $wasRunning) { $app.Quit() }; [void][Runtime.InteropServices.Marshal]::ReleaseComObject($app); [GC]::Collect(); [GC]::WaitForPendingFinalizers() }',
+    ].join('\r\n'));
+    const pr = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', ps1, file, made, outDir], { encoding: 'utf8', timeout: 180000 });
+    rmSync(ps1, { force: true });
+    if (existsSync(made)) { by = 'PowerPoint'; pdf = { path: made, pages: countPages(made) }; pngs = listPngs(); }
+    else pptErr = ((pr.stderr || pr.error?.message || '').trim().split(/\r?\n/)[0] || '').slice(0, 200);
+  }
+  const soffice = by || noRender ? null : findSoffice();
+  if (by) { /* 描けた */ }
+  else if (noRender) note = '描かない設定（LAYOUT_CHECK_NO_RENDER）なので、描いていない（指摘は中身からの見積もりだけ）。';
+  else if (!soffice) note = `${platform() !== 'win32' ? 'LibreOffice が見つからない' : process.env.LAYOUT_CHECK_NO_POWERPOINT ? 'PowerPoint を使わない設定（LAYOUT_CHECK_NO_POWERPOINT）で、LibreOffice も見つからない' : `PowerPoint で描けず（${pptErr || '理由は不明'}）、LibreOffice も見つからない`}ので、描いていない（指摘は中身からの見積もりだけ）。LibreOffice を入れるか、場所を LAYOUT_CHECK_SOFFICE に入れる。${platform() !== 'win32' ? 'PowerPoint がある PC では、PowerPoint で PDF に書き出して見る。' : ''}`;
+  else {
+    const prof = mkdtempSync(join(tmpdir(), 'layout-check-lo-'));
+    const r = spawnSync(soffice, ['--headless', `-env:UserInstallation=${pathToFileURL(prof).href}`, '--convert-to', 'pdf', '--outdir', outDir, file], { encoding: 'utf8', timeout: 240000 });
+    rmSync(prof, { recursive: true, force: true });
+    if (!existsSync(made)) note = `LibreOffice で PDF にできなかった: ${(r.stderr || r.error?.message || '').slice(0, 300)}`;
+    else {
+      by = 'LibreOffice';
+      pdf = { path: made, pages: countPages(made) };
+      const pp = spawnSync('pdftoppm', ['-png', '-r', '80', made, join(outDir, 'slide')], { encoding: 'utf8', timeout: 120000 });
+      if (!pp.error && pp.status === 0) pngs = listPngs();
+    }
+  }
+  if (pdf) {
+    if (o.pdf) { copyFileSync(made, resolve(o.pdf)); pdf.path = resolve(o.pdf); }
+    if (pdf.pages && pdf.pages !== slides.length) issues.push({ slide: 0, kind: 'pages', msg: `PDF が ${pdf.pages} ページで、スライドの ${slides.length} 枚と合わない` });
+  }
+  // 描いた結果から、文字の行の位置を取る。PowerPoint で描いたときは PowerPoint が返した値、ほかは PDF の文字の位置（pdftotext が要る）
+  let lines = null, measuredBy = null;
+  const lj = join(outDir, 'lines.json');
+  if (by === 'PowerPoint' && existsSync(lj)) {
+    try {
+      lines = JSON.parse(readFileSync(lj, 'utf8').replace(/^\ufeff/, '')).map((l) => ({ slide: l.s, id: l.id, x0: l.x, y0: l.y, x1: l.x + l.w, y1: l.y + l.h, text: l.text, shape: { x0: l.sx, y0: l.sy, x1: l.sx + l.sw, y1: l.sy + l.sh, filled: l.filled } }));
+      measuredBy = 'PowerPoint';
+    } catch { lines = null; }
+    rmSync(lj, { force: true });
+  }
+  if (!lines && pdf) {
+    const bb = join(outDir, 'bbox.html');
+    const r = spawnSync('pdftotext', ['-bbox-layout', made, bb], { encoding: 'utf8', timeout: 120000 });
+    if (!r.error && r.status === 0 && existsSync(bb)) {
+      lines = [];
+      readFileSync(bb, 'utf8').split('<page ').slice(1).forEach((pg, i) => {
+        const k = (W / PT) / Number(attr(' ' + pg.slice(0, 200), 'width') || W / PT); // PDF の用紙とスライドの pt の比
+        const all = [];
+        for (const m of pg.matchAll(/<line xMin="([\d.-]+)" yMin="([\d.-]+)" xMax="([\d.-]+)" yMax="([\d.-]+)">([\s\S]*?)<\/line>/g)) {
+          const text = dec([...m[5].matchAll(/>([^<]*)<\/word>/g)].map((w) => w[1]).join(' '));
+          if (!text.trim()) continue;
+          const l = { slide: i + 1, x0: m[1] * k, y0: m[2] * k, x1: m[3] * k, y1: m[4] * k, text };
+          // どの図形の文字かは、文字の中身と近さで当てる
+          const cands = (boxes.get(i + 1) || []).filter((b) => norm(text).length >= 2 && b.text.includes(norm(text)));
+          const d = (b) => Math.hypot((b.x0 + b.x1) / 2 - (l.x0 + l.x1) / 2, (b.y0 + b.y1) / 2 - (l.y0 + l.y1) / 2);
+          if (cands.length) { l.shape = cands.sort((a, b) => d(a) - d(b))[0]; l.id = (boxes.get(i + 1) || []).indexOf(l.shape); }
+          all.push(l); lines.push(l);
+        }
+        // 中身にある文字が PDF に無ければ、スライドの外で切れている
+        const lost = (slideText.get(i + 1) || '').length - norm(all.map((l) => l.text).join('')).length;
+        if (lost >= 3) add(i + 1, 'outside', `文字の一部が描かれていない（およそ ${lost} 字）。スライドの外に出て切れている。文字を減らすか、箱を上に動かすか、スライドを分ける。`);
+      });
+      measuredBy = 'PDF';
+      rmSync(bb, { force: true });
+    }
+  }
+  if (lines) {
+    // 見積もりの指摘は、実測に置き換える
+    for (let i = issues.length - 1; i >= 0; i--) if (issues[i].estimated) issues.splice(i, 1);
+    const sw = W / PT, sh = H / PT, r0 = (v) => Math.round(v);
+    for (const n of new Set(lines.map((l) => l.slide))) {
+      const L = lines.filter((l) => l.slide === n);
+      let over = 0;
+      const spilled = new Set(), outs = new Set(); // あふれと、スライドの外は、箱（表ならセル）ごとに1件だけ出す
+      const more = (l, test) => { const k = l.id === undefined ? 0 : L.filter((m) => m.id === l.id && m !== l && test(m)).length; return k ? `ほか ${k} 行` : ''; };
+      const isOut = (l) => l.x0 < -2 || l.y0 < -2 || l.x1 > sw + 2 || l.y1 > sh + 2;
+      const spills = (l) => { const b = l.shape; return b && b.filled && (l.y1 - 3 > b.y1 + 2 || l.y0 + 3 < b.y0 - 2 || l.x1 - 1 > b.x1 + 2 || l.x0 + 1 < b.x0 - 2); };
+      for (const l of L) {
+        const key = l.id === undefined ? l : l.id;
+        if (isOut(l) && !outs.has(key)) { outs.add(key); add(n, 'outside', `文字がスライドの外に出ている：「${short(l.text)}」${more(l, isOut)}（文字の右端 ${r0(l.x1)}pt・下端 ${r0(l.y1)}pt。スライドは ${r0(sw)}×${r0(sh)}pt）`); }
+        const b = l.shape;
+        if (spills(l) && !spilled.has(key)) { spilled.add(key); add(n, 'overflow', `文字が箱からあふれている：「${short(l.text)}」${more(l, spills)}（箱は 左 ${r0(b.x0)}・上 ${r0(b.y0)}・右 ${r0(b.x1)}・下 ${r0(b.y1)}pt、この行は 左 ${r0(l.x0)}・上 ${r0(l.y0)}・右 ${r0(l.x1)}・下 ${r0(l.y1)}pt）。箱を広げるか、文字を減らす。`); }
+      }
+      for (let i = 0; i < L.length && over < 8; i++) for (let j = i + 1; j < L.length && over < 8; j++) {
+        const a = L[i], b = L[j];
+        if (a.id !== undefined && a.id === b.id) continue; // 同じ箱の中の行どうしは、行間で少し重なるのが普通
+        const ox = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0), oy = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0);
+        if (ox > 2 && oy > 0.35 * Math.min(a.y1 - a.y0, b.y1 - b.y0)) { over++; add(n, 'overlap', `文字どうしが重なっている：「${short(a.text)}」と「${short(b.text)}」（左 ${r0(Math.max(a.x0, b.x0))}pt、上 ${r0(Math.max(a.y0, b.y0))}pt のあたり）`); }
+      }
+    }
+    issues.sort((a, b) => a.slide - b.slide);
+  }
+  // 2枚以上なら、1回で見られるように、番号つきで並べた一覧の画像も作る（ブラウザがあるとき）
+  let sheet = null;
+  const browser = pngs.length > 1 ? findBrowser() : null;
+  if (browser) {
+    const cols = pngs.length > 12 ? 3 : 2, cw = cols === 3 ? 520 : 760, ch = Math.round(cw * H / W), rows = Math.ceil(pngs.length / cols);
+    const html = join(outDir, 'sheet.html'), out = join(outDir, 'sheet.png');
+    writeFileSync(html, `<!doctype html><meta charset="utf-8"><body style="margin:8px;background:#888;display:grid;grid-template-columns:repeat(${cols},${cw}px);gap:8px;font:16px sans-serif">${pngs.map((f, i) => `<div><div style="color:#fff;height:22px">${i + 1}</div><img src="${pathToFileURL(f).href}" style="width:${cw}px;height:${ch}px;display:block"></div>`).join('')}</body>`);
+    // この検査自身に HTML として描かせる（ブラウザの起動のしかたを1か所にするため。指摘は使わない）
+    spawnSync(process.execPath, [fileURLToPath(import.meta.url), html, '--out', out, '--width', String(16 + cols * (cw + 8)), '--height', String(16 + rows * (ch + 30)), '--json'], { encoding: 'utf8', timeout: 120000 });
+    rmSync(html, { force: true });
+    if (existsSync(out)) sheet = out;
+  }
+  const ratio = W / H;
+  const report = { file, slides: slides.length, slideSizeIn: [Math.round(W / 9144) / 100, Math.round(H / 9144) / 100], pdf, pngs, sheet, renderedBy: by, measuredBy, fonts: perSlide, groupedSlides, issues, note };
+  if (o.json) console.log(JSON.stringify(report, null, 1));
+  else {
+    console.log(`スライド ${slides.length} 枚、${report.slideSizeIn[0]}×${report.slideSizeIn[1]} インチ（${Math.abs(ratio - 16 / 9) < 0.01 ? '16:9' : Math.abs(ratio - 4 / 3) < 0.01 ? '4:3' : `比 ${ratio.toFixed(2)}`}）`);
+    for (const s of perSlide) if (s.fontsPt.length) console.log(`スライド ${s.slide} の文字の大きさ: ${s.fontsPt.join('・')}pt`);
+    if (pdf) console.log(`描いた PDF: ${pdf.path}（${pdf.pages} ページ。${by === 'PowerPoint' ? 'PowerPoint で描いた' : 'LibreOffice で描いたので、PowerPoint とはフォントと折り返しが少し違うことがある'}）`);
+    if (sheet) console.log(`全部のスライドを並べた一覧の画像: ${sheet}（まずこれを1回開いて見る）`);
+    if (pngs.length) console.log(`${sheet ? '1枚ずつの画像（一覧で気になったスライドだけ開く）' : '描いた画像'}: ${pngs.length === 1 ? pngs[0] : `${pngs[0]} から ${basename(pngs[pngs.length - 1])} まで ${pngs.length} 枚`}`);
+    else if (pdf) console.log('スライドごとの PNG は作っていない（pdftoppm が無い）。PDF を開いて見る。');
+    if (note) console.log(note);
+    if (groupedSlides.length && measuredBy !== 'PowerPoint') console.log(`スライド ${groupedSlides.join('・')} には、まとめた図形（グループ）がある。グループの中の図形は、位置とあふれを見ていない。画像で見る。`);
+    if (pdf && !sheet && pngs.length > 1) console.log('一覧の画像は作っていない（Chrome・Edge・Chromium が見つからない）。1枚ずつの画像を開いて見る。');
+    if (issues.length) { console.log(`指摘 ${issues.length} 件:`); for (const i of issues) console.log(`- ${i.msg}`); }
+    else console.log(`指摘なし（スライドの外に出た部品・${lines ? '文字どうしの重なり・箱からあふれた文字' : '入りきらない文字'}・小さい文字は見つからなかった）。`);
+    if (lines) console.log(`文字の重なり・あふれ・スライドの外は、描いた結果の文字の位置（${measuredBy === 'PowerPoint' ? 'PowerPoint が返した値' : 'PDF の文字の位置'}）から測った。図形や線が文字にかかる所、語の途中の折り返し、余白は測れないので、${sheet ? '一覧の画像' : '描いた画像（か PDF）'}で見る。`);
+    else console.log(`文字の収まりは文字数からの見積もりで、重なりは測っていない${pdf ? '（PDF の文字の位置を読む pdftotext が無い）' : ''}。${sheet ? '一覧の画像' : pdf ? '描いた画像（か PDF）' : '描ける PC で描いて、画像'}を開いて、重なり・あふれ・語の途中の折り返し・余白を目で見る。`);
+  }
+  process.exit(issues.length ? 1 : 0);
+}
+
 async function main() {
   const o = parseArgs(process.argv.slice(2));
   const fail = (msg) => { console.error(msg); process.exit(2); };
-  if (!o.file) fail('使い方: node layout-check.mjs <図.svg | 図.html | 図.mmd | 文書.md> [--width 1280] [--height 720] [--out 図.png] [--min-font 12] [--pdf 図.pdf] [--mermaid <mermaid.min.js>] [--json]');
+  if (!o.file) fail('使い方: node layout-check.mjs <図.svg | 図.html | 図.mmd | 文書.md | スライド.pptx> [--width 1280] [--height 720] [--out 図.png] [--min-font 12] [--pdf 図.pdf] [--mermaid <mermaid.min.js>] [--json]');
   const file = resolve(o.file);
   if (!existsSync(file)) fail(`ファイルが無い: ${file}`);
+  if (extname(file).toLowerCase() === '.pptx') return checkPptx(file, o, fail);
   if (typeof WebSocket === 'undefined') fail('Node 22 以上が要る（WebSocket を使う）。');
   const browser = findBrowser();
   if (!browser) fail('Chrome・Edge・Chromium が見つからない。場所を環境変数 LAYOUT_CHECK_BROWSER に入れるか、ブラウザを入れる。');

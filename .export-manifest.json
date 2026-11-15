@@ -112,6 +112,7 @@
     "test/check-authors.test.mjs",
     "test/db-read.test.mjs",
     "test/excel-read.test.mjs",
+    "test/fixtures/layout-check-broken.pptx",
     "test/japanese-writing.test.mjs",
     "test/layout-check.test.mjs",
     "test/powerbi-pbip.test.mjs",

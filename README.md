@@ -81,7 +81,7 @@ npx skills add itoken-lab-jp/skills -g --skill idea-planning design-interview pr
 | 名前（説明へのリンク） | 使う場面 |
 |---|---|
 | [web-ui-quality](docs/web-ui-quality.md) | Web の画面（フォーム・お知らせ・管理画面・データから作るレポートのページ）を AI に作らせる・整えさせるとき。好みの色や雰囲気は決めず、読める文字の大きさと色の差、スマホではみ出さないこと、押しやすさ、入力欄のラベルと欄の近くのエラー、日本語の行間と書体をそろえさせ、スマホと PC の幅でブラウザで開いて撮ってから渡させます |
-| [figure-making](docs/figure-making.md) | 構成図・流れ図・シーケンス図・見出し画像・スライドを、AI に SVG・HTML・Mermaid で書かせるとき。箱の大きさを文字から決めさせ、矢印のラベルと戻りの線の置き方、Mermaid の記号の逃がし方を守らせ、同梱の検査（文字の重なり・はみ出し・線が文字を通る所・Mermaid の構文エラーを出す）にかけさせ、描いた画像を自分で開いて直してから渡させます |
+| [figure-making](docs/figure-making.md) | 構成図・流れ図・シーケンス図・見出し画像・スライドを、AI に SVG・HTML・Mermaid や PowerPoint のファイル（.pptx）で作らせるとき。箱の大きさを文字から決めさせ、矢印のラベルと戻りの線の置き方、Mermaid の記号の逃がし方を守らせ、同梱の検査（文字の重なり・はみ出し・線が文字を通る所・Mermaid の構文エラーを、.pptx でも文字の重なり・あふれ・スライドの外を、座標つきで出す）にかけさせ、描いた画像を自分で開いて直してから渡させます |
 
 ```
 npx skills add itoken-lab-jp/skills -g --skill web-ui-quality figure-making
