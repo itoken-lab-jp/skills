@@ -89,7 +89,7 @@ npx skills add itoken-lab-jp/skills -g --skill test-workflow adversarial-review
 
 | 名前（説明へのリンク） | 使う場面 |
 |---|---|
-| [git-workflow](docs/git-workflow.md) | AI にコミット・PR・マージまで任せるとき。入れるファイルを名前で選ばせ、秘密を見つけたら伝えさせ、main との差でブランチに混ざったコミットを見つけさせます。CI の結果を見てからマージさせ、マージのあとは本番が自分のコミットになったかまで確かめさせます。CI の費用が増えたときは、設定からの推測でなく実際の請求で調べさせます |
+| [git-workflow](docs/git-workflow.md) | AI にコミット・PR・マージまで任せるとき。入れるファイルを名前で選ばせ、秘密を見つけたら伝えさせ、main との差でブランチに混ざったコミットを見つけさせます。main を取り込んで衝突したら、両方の意図を残させ、両立しない変更は黙って片方に決めさせません。CI の結果を見てからマージさせ、マージのあとは本番が自分のコミットになったかまで確かめさせます。CI の費用が増えたときは、設定からの推測でなく実際の請求で調べさせます |
 
 ```
 npx skills add itoken-lab-jp/skills -g --skill git-workflow
