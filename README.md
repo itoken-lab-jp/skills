@@ -32,10 +32,11 @@ npx skills add itoken-lab-jp/skills -g --skill generalizing-lessons
 | [pdf-read](docs/pdf-read.md) | PDF（資料・表・帳票、スキャン、縦書き）を AI に読ませるとき。スキャンは OCR し、金額などの怪しい所はページの画像で確かめさせます |
 | [db-read](docs/db-read.md) | DB（PostgreSQL・MySQL・SQL Server・Oracle）を AI に読ませるとき。ドライバやクライアントのライブラリを入れずに、同梱の実行ファイルで問い合わせの結果を CSV や JSON にします。書き換える文は断り、DB の側も読み取り専用にして走らせます。20万行を CSV に出す測定では、Python のドライバのスクリプトの1.3〜4倍の速さでした（[測り方と条件](docs/db-read.md#速さとメモリ)） |
 | [data-query](docs/data-query.md) | CSV・JSON・Parquet を AI に集計させるとき。pandas のスクリプトを書かせず、DuckDB の SQL を1本走らせます。Shift_JIS の CSV も読めます。200万行の CSV の集計で pandas の約5倍の速さでした（[測り方と条件](docs/data-query.md#速さとメモリ)） |
+| [chart-making](docs/chart-making.md) | CSV や表の数字から、資料に載せるグラフの画像を AI に作らせるとき。グラフで言うことを1文で置かせ、「グラフにして」とだけ頼んでも、データの中のいちばん大きい変化を見つけて目立たせます。小さい差は、軸を絞った点や折れ線か、基準との差の棒で見せ、値の棒の軸は切りません。円グラフなどの形を指定されたら、その形で作り、読み比べにくいときだけ、読み比べやすい形を1枚添えます。出来た画像は自分で開かせ、文字化けや重なりを直してから渡させます |
 | [exploratory-analysis](docs/exploratory-analysis.md) | データから効く手や傾向を探す、効果があるかを確かめるなど、答えがあるか分からない探索を AI に任せるとき。探す前に合格の線と範囲を書かせ、試した数を数えさせ、確かめのデータを汚させず、押されても線を下げさせません |
 
 ```
-npx skills add itoken-lab-jp/skills -g --skill excel-read pdf-read db-read data-query exploratory-analysis
+npx skills add itoken-lab-jp/skills -g --skill excel-read pdf-read db-read data-query chart-making exploratory-analysis
 ```
 
 ### 文章を書かせる
