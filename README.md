@@ -130,6 +130,16 @@ npx skills add itoken-lab-jp/skills -g --skill session-handoff delegating-work
 npx skills add itoken-lab-jp/skills -g --skill tacit-knowledge-interview generalizing-lessons skill-authoring
 ```
 
+### AI に教わる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [teaching](docs/teaching.md) | SQL・正規表現・道具の使い方など、新しいことを AI に教わるとき。目的と今の知識を聞かせ、1回に1つを短く、手元のデータで小さな問題を出させ、答えにうなずく前に実際に動かして確かめさせます。何日かに分けるときは、学びの記録をフォルダーに残させ、次の回にそれを読んで短い問いで思い出させてから進ませます。一言で済む質問には一言で答えます |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill teaching
+```
+
 ### アプリを操作させる
 
 | 名前（説明へのリンク） | 使う場面 |
