@@ -6,6 +6,24 @@
 
 やりたいことごとに並べています。1本ずつでも使えます。それぞれの見出しの下のコマンドで、その目的の Skill をまとめて入れられます（入れ方の詳しい説明は下の「入れ方」）。
 
+### よくある仕事から探す
+
+次の3つの仕事は、Skill の名前からは探しにくいため、使う Skill と、それぞれが AI にさせることを示します。どの Skill も1本だけで使えます。2本を挙げた仕事は、2本を一緒に入れると、その仕事で AI が外しやすい所をまとめて押さえられます。
+
+| 仕事 | 使う Skill と、AI にさせること |
+|---|---|
+| 週報・日報など、進み具合の報告を AI に書かせる | AI は、人から聞いた「テストは全部通った」を確認済みのように書き、遅れを報告の後ろに埋めがちです。[summary-certainty](docs/summary-certainty.md) が、自分で確かめたこと・推測・人から聞いた話を書き分けさせます。[when-to-escalate](docs/when-to-escalate.md) が、予定に響く遅れや問題を報告の先頭に書かせ、決めてほしいことには勧める案を添えさせます |
+| 議事録を AI に書かせ、出た宿題を追わせる | [japanese-writing](docs/japanese-writing.md) は日本語の文章全般の Skill で、議事録の書き方も入っています。議事録を決定事項・未決の事項・担当と期限のある課題の順に書かせ、会議で誰も言っていない担当や約束を書き足させません。[task-tracking](docs/task-tracking.md) が、宿題を会話の外の TODO.md に1行1件で書かせ、次の日に続きを始めるときに、TODO.md と実際の進み具合（フォルダーの中身や届いた返事）を照らさせます。GitHub の Issue などで管理している所では、宿題はそちらに書かせます |
+| 振り返りから学びや手引きを AI に書かせる | AI は「バッチの再実行で売上が二重に入った」から「再実行の前に件数を確かめる」のような、その1件にしか効かない学びを書きがちです。[generalizing-lessons](docs/generalizing-lessons.md) が、起きたことの理由を1文にさせ、ほかの場面にも当てはまる原則に言い直させ、その原則を別の事例に当てて確かめさせます |
+
+コマンドは上から表の行の順です。
+
+```
+npx skills add itoken-lab-jp/skills -g --skill summary-certainty when-to-escalate
+npx skills add itoken-lab-jp/skills -g --skill japanese-writing task-tracking
+npx skills add itoken-lab-jp/skills -g --skill generalizing-lessons
+```
+
 ### ファイルとデータを読ませる・調べさせる
 
 | 名前（説明へのリンク） | 使う場面 |
@@ -35,7 +53,7 @@ npx skills add itoken-lab-jp/skills -g --skill japanese-writing cold-read
 
 | 名前（説明へのリンク） | 使う場面 |
 |---|---|
-| [task-tracking](docs/task-tracking.md) | Issue などの票の道具を使っていないリポジトリやフォルダーで、やることを AI に管理させるとき。会話で出た「今週中に」「後ででいい」の頼みをその場で TODO.md に書かせ、1件ごとに終わりの条件を付けさせ、翌日のセッションに一覧と実物を照らして続きから始めさせます。git を使わない文書のフォルダーでも使えます |
+| [task-tracking](docs/task-tracking.md) | Issue などの票の道具を使っていないリポジトリやフォルダーで、やることを AI に管理させるとき。会話や議事録で出た「今週中に」「後ででいい」の頼みをその場で TODO.md に書かせ、1件ごとに終わりの条件を付けさせ、翌日のセッションに一覧と実物を照らして続きから始めさせます。git を使わない文書のフォルダーでも使えます |
 | [prioritizing](docs/prioritizing.md) | たまった Issue の片付けや、期限までの計画を AI に頼むとき。入る量と比べさせ、済んだもの・重なるものを先に外させ、遅れたときの損で並べさせ、削るか日をずらすかは推しつきで1つにして返させ、気づいたことを Issue や作業として積み増させません |
 
 ```
@@ -70,7 +88,7 @@ npx skills add itoken-lab-jp/skills -g --skill test-workflow adversarial-review
 | 名前（説明へのリンク） | 使う場面 |
 |---|---|
 | [noticing-anomalies](docs/noticing-anomalies.md) | 集計・取り込み・API からの取得・バッチの再実行・試験の直しなど、結果を人に渡す作業を AI に頼むとき。「成功」や合計で止めず、できるはずのものと実物を照らし、内訳で割っていつもと比べさせ、件数は普通なのに列がずれた、途中から税抜きになった、といった小さな異変を報告の最初に書かせます |
-| [summary-certainty](docs/summary-certainty.md) | AI に作業の報告・要約・お知らせを書かせるとき。確かめたこと・推測・人から聞いたことを分けさせ、聞いた話を「確認済み」と書かせず、断りを渡す文の中に置かせ、数字の条件を要約で落とさせません |
+| [summary-certainty](docs/summary-certainty.md) | AI に作業の報告（週報・日報を含む）・要約・お知らせを書かせるとき。確かめたこと・推測・人から聞いたことを分けさせ、聞いた話を「確認済み」と書かせず、断りを渡す文の中に置かせ、数字の条件を要約で落とさせません |
 | [when-to-escalate](docs/when-to-escalate.md) | AI に仕事を任せるときに、自分でやるか人に上げるか、指示に異を唱えるか、決まったら従うかの線を守らせ、報告を結論から書かせ、人の誤りを相手のやる気を壊さずに伝えさせるとき |
 
 ```
