@@ -74,6 +74,16 @@ npx skills add itoken-lab-jp/skills -g --skill task-tracking prioritizing ticket
 npx skills add itoken-lab-jp/skills -g --skill idea-planning design-interview prototyping agent-instructions
 ```
 
+### 画面を作らせる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [web-ui-quality](docs/web-ui-quality.md) | Web の画面（フォーム・お知らせ・管理画面・データから作るレポートのページ）を AI に作らせる・整えさせるとき。好みの色や雰囲気は決めず、読める文字の大きさと色の差、スマホではみ出さないこと、押しやすさ、入力欄のラベルと欄の近くのエラー、日本語の行間と書体をそろえさせ、スマホと PC の幅でブラウザで開いて撮ってから渡させます |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill web-ui-quality
+```
+
 ### 作ったものを確かめさせる
 
 | 名前（説明へのリンク） | 使う場面 |
