@@ -46,11 +46,12 @@ npx skills add itoken-lab-jp/skills -g --skill task-tracking prioritizing
 
 | 名前（説明へのリンク） | 使う場面 |
 |---|---|
+| [idea-planning](docs/idea-planning.md) | 新しい取り組み・施策・イベント・道具の導入の企画を AI に頼むとき。目的を1文で置かせ、資料と今ある物で前提を確かめさせ、形の違う案を「やらない」案も含めて比べさせ、推しを添えて、やるか・どの形にするかを本人に返させます。企画は1枚に収めさせます |
 | [design-interview](docs/design-interview.md) | 大きめの新機能や作り直しを AI に頼むとき。作り始める前に、決めることを一覧にして、番号と推奨つきの問いで回ごとに聞かせ、細部は既定で決めさせて、決めたことを記録してから作らせます。長い設計書をまとめて読ませて承認させることはしません |
 | [agent-instructions](docs/agent-instructions.md) | AGENTS.md・CLAUDE.md・`.cursor/rules` などの指示ファイルを、新しいリポジトリに置く・足す・長くなったものを見直すとき。読み込む量を測り、実物と照らし、正本を1つにして、新しいセッションで効いたかを確かめさせます。main ブランチの守り（GitHub の ruleset・必須の CI）の作り方と落とし穴も入っています |
 
 ```
-npx skills add itoken-lab-jp/skills -g --skill design-interview agent-instructions
+npx skills add itoken-lab-jp/skills -g --skill idea-planning design-interview agent-instructions
 ```
 
 ### 作ったものを確かめさせる
