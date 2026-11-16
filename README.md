@@ -185,9 +185,9 @@ npx skills add itoken-lab-jp/skills -g --skill teaching
 npx skills add itoken-lab-jp/skills -g --skill powerbi-pbip ui-operation
 ```
 
-### Skill を入れずに試す：指示ファイルに貼る1枚
+### Skill を入れずに試す：節目の確認リスト
 
-[節目で自分に問うこと](docs/checkpoint-questions.md) は、AI が作業の節目（始める前・終えたと言う前・伝えるとき）で外しやすい所を、11の問いにまとめた約1,200字の文です。Skill ではなく、毎回読まれる指示ファイル（`CLAUDE.md`・`AGENTS.md`）に貼って使います。試した 18 の場面では、何も入れないときに 57% だった点が、これだけで 70% になりました（Skill 35本を入れると 83%、両方で 86%。2026年11月16日、Claude Code）。
+[節目の確認リスト](docs/checkpoint-questions.md) は、AI が作業の節目（始める前・終えたと言う前・伝えるとき）で外しやすい所を、11項目にまとめた約1,200字の文です。Skill ではなく、毎回読まれる指示ファイル（`CLAUDE.md`・`AGENTS.md`）に貼って使います。試した 18 の場面では、何も入れないときに 57% だった点が、これだけで 70% になりました（Skill 35本を入れると 83%、両方で 86%。2026年11月16日、Claude Code）。
 
 ### サブエージェントの定義（agents/）
 
