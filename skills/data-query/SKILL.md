@@ -1,6 +1,6 @@
 ---
 name: data-query
-description: CSV・TSV・JSON・JSON Lines・Parquet のファイル（DB や Excel から書き出したものも）を集計・絞り込み・結合・並べ替え・形の変換をするときに、pandas などのスクリプトを書かずに DuckDB の SQL で行う手順。Shift_JIS の CSV も読める。ファイルを書き換えるとき、グラフを描くときには使わない。
+description: CSV・TSV・JSON・JSON Lines・Parquet のファイル（DB や Excel から書き出したものも）の集計・絞り込み・結合・並べ替え・形の変換が要る作業を頼まれたら、手を付ける前に読む。pandas などのスクリプトを書かずに DuckDB の SQL で行う手順。Shift_JIS の CSV も読める。ファイルを書き換えるとき、グラフを描くときには使わない。
 ---
 
 # ファイルを DuckDB の SQL で集計する
