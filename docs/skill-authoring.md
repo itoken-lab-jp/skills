@@ -33,3 +33,7 @@ npx skills add itoken-lab-jp/skills -g --skill skill-authoring
 ```
 
 Claude Code・Codex・Cursor・GitHub Copilot・Antigravity に入ります。`-g` は、全部のプロジェクトで使える置き場に入れる指定です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-16：本文の書き方に、確かめる問いの並びで足りる Skill は短く書くこと、見分け方の知識は削らないこと、今ある Skill を短くするときは元の場面で比べてから置き換えることを足した
