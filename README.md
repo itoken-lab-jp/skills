@@ -46,9 +46,10 @@ npx skills add itoken-lab-jp/skills -g --skill excel-read pdf-read db-read data-
 | [japanese-writing](docs/japanese-writing.md) | 日本語の文章（PR や Issue の本文・README・docs・報告・メール・手順書・議事録・記事）を AI に書かせる・直させる・見直させるとき |
 | [cold-read](docs/cold-read.md) | AI が書いた文章（README・docs・記事）を、経緯を知らない別のエージェントに読ませて、伝わらない所を見つけるとき |
 | [japanese-translation](docs/japanese-translation.md) | 英語のお知らせ・リリースノート・メール・規約などを AI に日本語に訳させるとき。読み手と用途で訳し方を決めさせ（社内に回す案内は誰が何をするかを先に、契約は原文に沿って）、条件・数字・確からしさを落とさず強めず、画面の名前は原文を残させます |
+| [audience-fit](docs/audience-fit.md) | AI に、頼んだ人とは別の人が読む物（新人向けの手順の1枚、取引先へのお知らせ、社長への1分の報告、インタビューの質問、社外への依頼や交渉のメール）を作らせるとき、返事が長いとき。書き終えてから、頼みと並べて頼まれていない物を削らせ、時間や紙の枠に入る数まで減らさせ、元の資料から写した社内の言葉を読む人が知っているかで言い換えさせ、相手の席で読んで頼んだ人の弱みや未決のことを書いていないかを見させます |
 
 ```
-npx skills add itoken-lab-jp/skills -g --skill japanese-writing cold-read japanese-translation
+npx skills add itoken-lab-jp/skills -g --skill japanese-writing cold-read japanese-translation audience-fit
 ```
 
 ### やることを管理させる
