@@ -109,6 +109,26 @@ npx skills add itoken-lab-jp/skills -g --skill test-workflow adversarial-review
 npx skills add itoken-lab-jp/skills -g --skill git-workflow
 ```
 
+### Windows で動かすスクリプトを書かせる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [windows-script-encoding](docs/windows-script-encoding.md) | AI にバッチファイル（.bat）や PowerShell のスクリプト（.ps1）を書かせて、タスクスケジューラーや社内の PC で動かすとき。日本語のパスやメッセージを含んでも、cmd と Windows PowerShell 5.1 で文字化けや構文エラーにならない文字コードで保存させ、渡す先の読み手で確かめさせます |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill windows-script-encoding
+```
+
+### Excel で開く CSV を作らせる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [csv-for-excel](docs/csv-for-excel.md) | AI に CSV を作らせて、営業や経理の人が Excel で開いて使うとき。Excel が開いた瞬間に、先頭の0を消す、番地の「1-2」を「1月2日」にする、長い番号を「1.23E+18」にするのを防ぐ形で書かせ、Excel で開いて確かめさせます |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill csv-for-excel
+```
+
 ### 結果の報告と相談を任せる
 
 | 名前（説明へのリンク） | 使う場面 |
