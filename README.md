@@ -185,6 +185,10 @@ npx skills add itoken-lab-jp/skills -g --skill teaching
 npx skills add itoken-lab-jp/skills -g --skill powerbi-pbip ui-operation
 ```
 
+### Skill を入れずに試す：指示ファイルに貼る1枚
+
+[節目で自分に問うこと](docs/checkpoint-questions.md) は、AI が作業の節目（始める前・終えたと言う前・伝えるとき）で外しやすい所を、11の問いにまとめた約1,200字の文です。Skill ではなく、毎回読まれる指示ファイル（`CLAUDE.md`・`AGENTS.md`）に貼って使います。試した 18 の場面では、何も入れないときに 57% だった点が、これだけで 70% になりました（Skill 35本を入れると 83%、両方で 86%。2026年11月16日、Claude Code）。
+
 ### サブエージェントの定義（agents/）
 
 サブエージェントの定義は、名前・使える道具・最初に読む指示を書いた Markdown のファイルです。[agents](agents) に、cold-read の読み手 `cold-reader` と、adversarial-review のレビュアー `readonly-reviewer` を置いています。どちらも道具をファイルを読むことだけに絞っているため、読み手やレビュアーがファイルを書き換えたり、指示ファイルの文脈を持ち込んだりしません。Skill の手順がこの名前を指すので、置いておけばエージェントがその定義で立てます。
