@@ -60,15 +60,15 @@ Excel は、Python などでスクリプトを書かずに、この Skill に入
 
 ## 設定ファイル（table）
 
-見出しが複数行の表と、捨てる行のある帳票は、設定ファイル（JSON）を書いて `table --config` に渡す。書き方（`range`・`header_rows`・`drop_rows`・`stop_when`・`fill_merged` など）は [references/table.md](references/table.md) の「設定ファイル（table）」。
+見出しが複数行の表と、捨てる行のある帳票は、設定ファイル（JSON）を書いて `table --config` に渡す。書く前に [references/table.md](references/table.md) の「設定ファイル（table）」を読む（`range`・`header_rows`・`drop_rows`・`stop_when`・`fill_merged` などの書き方）。
 
 ## Power Query と VBA
 
-`excel-read queries ブック.xlsx` で Power Query の M のコードを、`excel-read vba ブック.xlsm` で VBA のコードを出す。読むだけで、実行も更新もしない。出力の形と対応する形式は [references/queries-vba.md](references/queries-vba.md)。
+`excel-read queries ブック.xlsx` で Power Query の M のコードを、`excel-read vba ブック.xlsm` で VBA のコードを出す。読むだけで、実行も更新もしない。出力を読む前に [references/queries-vba.md](references/queries-vba.md) を読む（出力の形と対応する形式）。
 
 ## できないこと
 
-式は計算し直さず、保存された計算の結果だけを読む（式の列に値が無ければ、Excel で開いて保存し直してもらう）。表示の文字そのもの、文字の色や塗り、図形・グラフ・画像・コメント・ピボットの定義、パスワード付きのファイル、パスワードで保護した VBA のコードは読めない。形式ごとに読めないもの（隠した行・結合・表示形式）を含めた一覧は [references/limits.md](references/limits.md)。色で意味を付けた表に見えたら、ユーザーに聞く。
+式は計算し直さず、保存された計算の結果だけを読む（式の列に値が無ければ、Excel で開いて保存し直してもらう）。表示の文字そのもの、文字の色や塗り、図形・グラフ・画像・コメント・ピボットの定義、パスワード付きのファイル、パスワードで保護した VBA のコードは読めない。値が空・表示と違う・形式が古いときは [references/limits.md](references/limits.md) を読む（形式ごとに読めないもの、隠した行・結合・表示形式を含めた一覧）。色で意味を付けた表に見えたら、ユーザーに聞く。
 
 ## 読めないとき
 

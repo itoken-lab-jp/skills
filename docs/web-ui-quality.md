@@ -88,3 +88,4 @@ npx skills add itoken-lab-jp/skills -g --skill web-ui-quality
 ## 変更履歴
 
 - 2026-11-15：公開。Web の画面の品質の下限をそろえ、ブラウザで確かめてから渡す手順
+- 2026-11-18：references を指す文を、何が書いてあるかと、いつ読むかを動作で書く形にそろえた（中身は同じ）

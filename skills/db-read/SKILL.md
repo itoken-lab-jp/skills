@@ -21,7 +21,7 @@ DB は、Python などでドライバを入れてスクリプトを書かずに�
 
 つなぎ先は、PC ごとの `~/.config/db-read/db.toml`（Windows は `%USERPROFILE%\.config\db-read\db.toml`）に名前を付けて書く。リポジトリには置かない。パスワードはファイルにも引数にも書かず、環境変数の名前を書く（環境変数はユーザーに入れてもらう。エージェントがパスワードを聞いて書き込まない）。
 
-設定の例（Oracle、SQL Server の Windows の認証、Cloud SQL の MySQL）、暗号化（`tls`）、自分の CA を使う DB で `UnknownIssuer` や `certificate not valid for name` が出たときの `ca_cert`・`verify_host`・`trust_cert` の選び方、Oracle の `connect_string` と暗号化（`ca_cert`・`trust_cert` は受け付けない）は [references/connections.md](references/connections.md) を読む。
+設定を書く前と、つなぐときにエラーが出たときは [references/connections.md](references/connections.md) を読む。設定の例（Oracle、SQL Server の Windows の認証、Cloud SQL の MySQL）、暗号化（`tls`）、自分の CA を使う DB で `UnknownIssuer` や `certificate not valid for name` が出たときの `ca_cert`・`verify_host`・`trust_cert` の選び方、Oracle の `connect_string` と暗号化（`ca_cert`・`trust_cert` は受け付けない）がある。
 
 - 設定が無い、または目的の DB が無いときは、ユーザーに行き先（種類・ホスト・DB の名前・ユーザー）を聞いて書く。読むだけの権限のユーザーを使うよう勧める。ホームの設定の書き換えは権限の判定で止められることがあるので、止められたら別の道で書かず、書く中身をユーザーに渡す。
 - 別の場所の設定を使うときは `--config 設定.toml` か、環境変数 `DB_READ_CONFIG`。
@@ -50,7 +50,7 @@ DB は、Python などでドライバを入れてスクリプトを書かずに�
 本番の DB を誤って書き換えないことと、読むことで本番を止めないことが目的。
 
 - 本当の守りは、読むだけの権限のユーザーでつなぐこと。道具の守りは誤操作よけにとどまる。書き換えが要る作業はこの道具ではしない。ユーザーに確かめてから、別の手段で行う。
-- 道具は、`SELECT`・`WITH`・`SHOW`・`DESCRIBE`・`DESC`・`EXPLAIN` で始まる文1つだけを通し、DB の側も読み取り専用にしてから走らせる。断られたら（終了コード 1）、文を分けるか、書き換えを含まない形に直す。どの DB で何を断るかの細部は [references/guard.md](references/guard.md)。
+- 道具は、`SELECT`・`WITH`・`SHOW`・`DESCRIBE`・`DESC`・`EXPLAIN` で始まる文1つだけを通し、DB の側も読み取り専用にしてから走らせる。断られたら（終了コード 1）、文を分けるか、書き換えを含まない形に直す。断られた理由が分からないときは [references/guard.md](references/guard.md) を読む（どの DB で何を断るかの細部）。
 - 守りが見るのは文の形で、`SELECT` の中から呼ぶ関数の中身は見ない。副作用のある関数（Oracle の自律型トランザクションの関数、PostgreSQL の `pg_cancel_backend`・`dblink` など）は、読み取り専用でも書き換えや操作が確定することがあるので、呼ばない。
 - 読むだけでも、重い `SELECT` は本番の DB の負荷とロックになる（SQL Server の既定の隔離レベルでは、読んでいる間の共有ロックが更新を待たせる）。大きな表は、件数を見てから、絞って読む。
 

@@ -42,3 +42,7 @@ npx skills add itoken-lab-jp/skills -g --skill powerbi-pbip
 ```
 
 Claude Code・Codex・Cursor・GitHub Copilot・Antigravity に入ります。`-g` は、全部のプロジェクトで使える置き場に入れる指定です。手順の本文は [SKILL.md](../skills/powerbi-pbip/SKILL.md)、入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-18：外から直さないファイルの一覧を references から本文に移した（守りの決まりは本文に置く方針に合わせた）。ページ・ビジュアルのフォルダーを足す・名前を変える前と PBIR を読み始める前に、references/pbip-files.md を読むと書いた。ほかの references を指す文も、いつ読むかを動作で書く形にそろえた

@@ -49,7 +49,7 @@ description: Web の画面（HTML・CSS・React などのページ、フォー�
 コードを読んだだけでは、色の差・はみ出し・重なりは分からない。渡す前にブラウザで開く。
 
 - 幅 390px（スマホ）と 1440px（PC）で開いて撮り、撮った画像を見る。手元にブラウザが無いときは、確かめていないと報告に書く。
-- 測れる所は測る：横のはみ出し（`document.documentElement.scrollWidth > innerWidth`）、本文の文字の大きさ、使った色の組の比、小さい押せる所、Tab でのフォーカス。測り方の例は [references/check.md](references/check.md)。
+- 測れる所は測る：横のはみ出し（`document.documentElement.scrollWidth > innerWidth`）、本文の文字の大きさ、使った色の組の比、小さい押せる所、Tab でのフォーカス。測る前に [references/check.md](references/check.md) を読む（測り方の例）。
 - フォームは、空のまま送ったとき・形式を間違えたときに、どう出るかを実際に押して見る。
 - 外とつながる所（action・name・リンク先）が元のままか、差分で見る。
 - 直して撮り直すのは2〜3回までにする。好みの差（色合い・角の丸み）は直し続けず、撮った画像を頼んだ人に見てもらう。

@@ -28,3 +28,4 @@ npx skills add itoken-lab-jp/skills -g --skill adversarial-review
 ## 変更履歴
 
 - 2026-11-15：報告にこの Skill の中の事情（敵対レビューを回したか、どの条件に当たったか）を書かない、を足した。
+- 2026-11-18：references を指す文を、何が書いてあるかと、いつ読むかを動作で書く形にそろえた（中身は同じ）

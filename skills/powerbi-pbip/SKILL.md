@@ -39,7 +39,7 @@ PBIP は Power BI Desktop の保存形式の一つで、レポートとモデル
 - 直す前に、Desktop で開いているなら保存してもらう（Desktop は保存するまでファイルに書かない）。ディスクのファイルが正。
 - 文字コードは BOM の無い UTF-8。パスは 260 文字まで。
 - `unappliedChanges.json`（`.SemanticModel` のフォルダー）があるときは、Desktop で保留中の変更を先に適用してもらってから TMDL を直す。適用しないままだと、外からの式の変更が捨てられる。
-- フォルダー名の決まり、外から直さないファイル、PBIR を読むときの当たりの付け方は [references/pbip-files.md](references/pbip-files.md)。レポートの CLI は [references/report-cli.md](references/report-cli.md)。
+- 外から直さない：`definition.pbir`、PBIR-Legacy の `report.json`、`mobileState.json`、`semanticModelDiagramLayout.json`、`diagramLayout.json`。ページ・ビジュアルのフォルダーを足す・名前を変える前と、PBIR を読み始める前に [references/pbip-files.md](references/pbip-files.md) を読む（フォルダー名の決まり、当たりの付け方）。レポートの CLI を使う前に [references/report-cli.md](references/report-cli.md) を読む。
 
 ## モデルを書く（DAX・M・TMDL）
 
@@ -70,7 +70,7 @@ ORDER BY '売上'[部門]
 
 DAX の結果が 0 行でエラーも無いときは、まずデータが取り込まれているか（1）を疑う。DAX のクエリで正しくても、ビジュアルに届く値が同じとは限らない（凡例・スライサー・ビジュアルのフィルターはクエリと違う文脈で入る）。ビジュアルに使うときは、撮影でも見る。
 
-MCP のつなぎ方（引数の形、ポートの見つけ方、つなぐ先の取り違え）は [references/authoring-mcp.md](references/authoring-mcp.md)。
+MCP につなぐ前に [references/authoring-mcp.md](references/authoring-mcp.md) を読む（引数の形、ポートの見つけ方、つなぐ先の取り違え）。
 
 ## Desktop に入れる
 
@@ -94,7 +94,7 @@ Bridge の CLI の `reload` はレポートだけを読み直し、**モデル�
 - 「更新」「今すぐ更新」のあとは未保存になるので、次の読み直しの前に保存してもらう（保存で `cache.abf` も書かれる）。保存すると Desktop が TMDL にも書く（日付の列のある表を足したときの自動の日付テーブル `LocalDateTable_…` など）。git で管理しているなら、この差分をコミットに入れるかをユーザーに聞く。
 - Authoring MCP がつながっていれば、「更新」「今すぐ更新」を MCP の `RefreshWithXMLA` に置き換えられる（定義だけの変更は `Calculate`、取り込みの変更は変えた表だけ `Full`）。自分で開いた Desktop だけに使う。
 
-撮影・色・Bridge が切られているときの代わりは [references/desktop-bridge.md](references/desktop-bridge.md)。
+撮る前と、Bridge が切られているときは [references/desktop-bridge.md](references/desktop-bridge.md) を読む（撮影・色・代わりの手）。
 
 ## 出典
 

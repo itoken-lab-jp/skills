@@ -73,3 +73,7 @@ npx skills add itoken-lab-jp/skills -g --skill tacit-knowledge-interview
 ```
 
 手順の本文は [SKILL.md](../skills/tacit-knowledge-interview/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-18：references を指す文を、何が書いてあるかと、いつ読むかを動作で書く形にそろえた（中身は同じ）
