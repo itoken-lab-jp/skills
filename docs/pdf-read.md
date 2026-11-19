@@ -40,3 +40,7 @@ npx skills add itoken-lab-jp/skills -g --skill pdf-read
 ```
 
 手順の本文は [SKILL.md](../skills/pdf-read/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-19：スキャンの OCR のコマンドを、出力の形を `-c tessedit_create_txt=1 -c tessedit_create_tsv=1` で渡す形に直した。前の `txt tsv` の形は、日本語のデータだけを置いたフォルダーを渡すと TSV が出ず（エラーにならない）、確信度で怪しい所を拾う段が動かなかった

@@ -37,12 +37,12 @@ Poppler（`pdftotext`・`pdftoppm`・`pdfinfo`・`pdffonts`・`pdfimages`）と 
 3. **スキャンを OCR する**：ページを画像にしてから tesseract に渡す（tesseract は PDF を直接読まない）。
    ```
    pdftoppm -r 200 -gray -png -f 1 -l 1 -singlefile スキャン.pdf page-1
-   tesseract page-1.png page-1 -l jpn --psm 3 --tessdata-dir <tessdata> txt tsv
+   tesseract page-1.png page-1 -l jpn --psm 3 --tessdata-dir <tessdata> -c tessedit_create_txt=1 -c tessedit_create_tsv=1
    ```
    - 1ページずつ `-f N -l N -singlefile` で出し、名前にページの番号を入れる。`-singlefile` を付けずに範囲で出すと、番号が総ページ数の桁で 0 埋めされる（14ページの PDF なら `page-01.png`）。
    - `-r` は、`pdfimages -list` の `x-ppi`（スキャンの解像度）に合わせる。上げても読めるようにはならず、200dpi のスキャンを 300dpi で画像にすると、文字の一致が 0.974 から 0.938 に下がった。解像度が分からなければ 200〜300。
    - 縦書きのページは `-l jpn_vert` にする（Windows の測定で、縦書きの試料の文字の一致 0.991）。
-   - `txt tsv` で、文字（`page-1.txt`）と語ごとの位置と確信度（`page-1.tsv`）を1回で出す。`page-1` は出力の名前（拡張子は tesseract が付ける）。
+   - 2つの `-c` で、文字（`page-1.txt`）と語ごとの位置と確信度（`page-1.tsv`）を1回で出す。`page-1` は出力の名前（拡張子は tesseract が付ける）。末尾に `txt tsv` と書く形は、`<tessdata>` に `configs` のフォルダーが無いと `Can't open tsv` を出して TSV を作らず、終了コードは 0 のまま。`TESSDATA_PREFIX` に `<tessdata>` を入れてあれば、`--tessdata-dir` は省ける。
    - ページが多ければ、ページごとに繰り返す。1ページ 1〜4秒かかるので、数十ページを超えるときは、要るページから先に読む。
 4. **怪しい所を画像で確かめる**：OCR の結果は、そのまま数字として使わない。
    - `page-1.tsv` の `conf`（確信度、0〜100）が低い語を拾う。クラウドで標準の日本語のデータを使って表の1ページを測ったとき、正しい数字は 84〜95、誤読は 3〜53 だった（`4A410.000` が 47、`寺` が 3、`+4.689` が 53）。ただし正しい語でも 40 前後のことがあり、確信度が高いまま誤る場合もありうる。`tessdata_best` での分かれ方は確かめていない。目安は 60 未満。TSV は SQL で集計できる道具（DuckDB など）で絞れる（次の問い合わせは走らせて確かめていない。列が崩れたら `read_csv` の引数を直す）：`duckdb -agent -c "SELECT page_num, line_num, conf, text FROM read_csv('page-1.tsv', delim = '\t', quote = '', all_varchar = true) WHERE text <> '' AND conf::DOUBLE BETWEEN 0 AND 60"`。
