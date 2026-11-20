@@ -34,9 +34,10 @@ npx skills add itoken-lab-jp/skills -g --skill generalizing-lessons
 | [data-query](docs/data-query.md) | CSV・JSON・Parquet を AI に集計させるとき。pandas のスクリプトを書かせず、DuckDB の SQL を1本走らせます。Shift_JIS の CSV も読めます。200万行の CSV の集計で pandas の約5倍の速さでした（[測り方と条件](docs/data-query.md#速さとメモリ)） |
 | [chart-making](docs/chart-making.md) | CSV や表の数字から、資料に載せるグラフの画像を AI に作らせるとき。グラフで言うことを1文で置かせ、「グラフにして」とだけ頼んでも、データの中のいちばん大きい変化を見つけて目立たせます。小さい差は、軸を絞った点や折れ線か、基準との差の棒で見せ、値の棒の軸は切りません。円グラフなどの形を指定されたら、その形で作り、読み比べにくいときだけ、読み比べやすい形を1枚添えます。出来た画像は自分で開かせ、文字化けや重なりを直してから渡させます |
 | [exploratory-analysis](docs/exploratory-analysis.md) | データから効く手や傾向を探す、効果があるかを確かめるなど、答えがあるか分からない探索を AI に任せるとき。探す前に合格の線と範囲を書かせ、試した数を数えさせ、確かめのデータを汚させず、押されても線を下げさせません |
+| [untangling-data](docs/untangling-data.md) | 売上が落ちた原因、施策の効果、店や担当の順位、どの層に効いたかなど、データから原因や違いを AI に読み解かせるとき。見えている数字を、何もしなくても起きた動き・知りたい効き・偶然の振れに分けさせます。件数の少ない店が上位と下位に並ぶ順位は、件数を考えに入れて付け直させ、たくさん切った層の中の一番は発見にさせず、売上に合わせて決めている広告費や人員を原因と読ませません |
 
 ```
-npx skills add itoken-lab-jp/skills -g --skill excel-read pdf-read db-read data-query chart-making exploratory-analysis
+npx skills add itoken-lab-jp/skills -g --skill excel-read pdf-read db-read data-query chart-making exploratory-analysis untangling-data
 ```
 
 ### 文章を書かせる
@@ -185,9 +186,20 @@ npx skills add itoken-lab-jp/skills -g --skill teaching
 npx skills add itoken-lab-jp/skills -g --skill powerbi-pbip ui-operation
 ```
 
-### Skill を入れずに試す：節目の確認リスト
+### 指示ファイルに入れる文（rules/）
 
-[節目の確認リスト](docs/checkpoint-questions.md) は、AI が作業の節目（始める前・終えたと言う前・伝えるとき）で外しやすい所を、11項目にまとめた約1,200字の文です。Skill ではなく、毎回読まれる指示ファイル（`CLAUDE.md`・`AGENTS.md`）に貼って使います。試した 18 の場面では、何も入れないときに 57% だった点が、これだけで 70% になりました（Skill 35本を入れると 83%、両方で 86%。2026年11月16日、Claude Code）。
+Skill は、頼みの種類に合わせて選ばれる手順書です。どの頼みにも関わる構えや、作業の途中の節目で要る確認は、Skill では届きにくいので、AI が毎回読む指示ファイル（`CLAUDE.md`・`AGENTS.md`）に入れる文として配っています。Skill を1本も入れていなくても使えます。
+
+| 文 | 何を直すか | 本文 |
+|---|---|---|
+| [節目の確認リスト](docs/checkpoint-questions.md) | 件数を数えずに「終わりました」と言う、聞いた話を確かめたように報告する、といった節目の外し方 | [rules/checkpoint-questions.md](rules/checkpoint-questions.md) |
+| [目的を預かる](docs/holding-the-goal.md) | 大きな目標を、頼まれていないのに小さく置き換えて返す癖。判定の厳しさは保つ | [rules/holding-the-goal.md](rules/holding-the-goal.md) |
+
+入れ方は、本文をそのまま貼るか、[agent-instructions](docs/agent-instructions.md) の Skill を入れてエージェントに「itoken-lab-jp/skills の rules/<名前>.md を指示ファイルに入れて」と頼みます（出どころと日付の印で挟むので、あとから更新できます）。`npx skills add` では入りません。
+
+[節目の確認リスト](docs/checkpoint-questions.md) は、AI が作業の節目（始める前・終えたと言う前・伝えるとき）で外しやすい所を、11項目にまとめた約1,200字の文です。試した 18 の場面では、何も入れないときに 57% だった点が、これだけで 70% になりました（Skill 35本を入れると 83%、両方で 86%。2026年11月16日、Claude Code）。
+
+[目的を預かる](docs/holding-the-goal.md) は、大きな目標の相談を受けたときの構えを書いた約400字の文です。大きすぎる目標を相談する場面で、入れないときは9回のうち8回が最初の返事で目標を置き換え、入れると12回のうち11回がそのまま受けました（2026年11月20日、Claude Code）。
 
 ### サブエージェントの定義（agents/）
 
