@@ -33,7 +33,7 @@ duckdb -agent -c "SELECT 部門, SUM(金額) AS 金額 FROM '売上.csv' GROUP B
 ## 読み方
 
 - CSV：`FROM '売上.csv'` で、区切り・見出し・型を当てて読む。外れたら `FROM read_csv('売上.csv', header = true, delim = '\t', all_varchar = true)` のように指定する。`all_varchar = true` は型の推測を止め、全部を文字で読む（コードの先頭の 0 を落とさない）。
-- Shift_JIS の CSV（Windows の Excel が書いたものなど）：`INSTALL encodings; LOAD encodings;` のあと `read_csv('a.csv', encoding = 'cp932')`。`'shift_jis'` だと `①`・`㈱`・`髙` のような Windows の文字で「not shift_jis encoded」と止まるので、`cp932` を使う（DuckDB 2.0 で確かめた）。`INSTALL` は初回にネットから落とすので、社内のネットワークなどで落ちなければユーザーに伝える。
+- Shift_JIS の CSV（Windows の Excel が書いたものなど）：`INSTALL encodings; LOAD encodings;` のあと `read_csv('a.csv', encoding = 'cp932')`。`'shift_jis'` だと `①`・`㈱`・`髙` のような Windows の文字で「not shift_jis encoded」と止まるので、`cp932` を使う（DuckDB 2.0 で確かめた）。`INSTALL` は初回にネットから落とすので、社内のネットワークなどで落とせなければユーザーに伝える。
 - JSON・JSON Lines：`FROM 'a.json'` か `read_json('a.jsonl', format = 'newline_delimited')`。入れ子は `unnest` でほどく。
 - 複数のファイル：`FROM 'logs/*.csv'`（`filename = true` でファイルの名前の列が付く）。
 - 中身をまず見る：`DESCRIBE SELECT * FROM 'a.csv'`（列と型）、`SUMMARIZE SELECT * FROM 'a.csv'`（列ごとの最小・最大・件数・NULL の割合）。

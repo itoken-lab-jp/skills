@@ -15,7 +15,7 @@ Excel は、Python などでスクリプトを書かずに、この Skill に入
 - Mac（Apple シリコン）：`scripts/mac-arm64/excel-read`
 - Linux（x64）：`scripts/linux-x64/excel-read`
 
-この Skill のフォルダーはエージェントごとに違う（Claude は `~/.claude/skills/excel-read`、Codex は `~/.agents/skills/excel-read`、Antigravity のアプリと IDE は `~/.gemini/config/skills/excel-read`、Antigravity CLI は `~/.gemini/antigravity-cli/skills/excel-read`、Kiro は `~/.kiro/skills/excel-read`）。中身はどれも同じ。上の3つに当たらない機械（Intel の Mac、ARM の Windows など）では動かないので、下の「読めないとき」に進む。
+この Skill のフォルダーはエージェントごとに違う（Claude は `~/.claude/skills/excel-read`、Codex は `~/.agents/skills/excel-read`、Antigravity のアプリと IDE は `~/.gemini/config/skills/excel-read`、Antigravity CLI は `~/.gemini/antigravity-cli/skills/excel-read`、Kiro は `~/.kiro/skills/excel-read`）。中身はどれも同じ。上の3つの実行ファイルに当たらない機械（Intel の Mac、ARM の Windows など）では動かないので、下の「読めないとき」に進む。
 
 以下、例ではフルパスを `excel-read` と略す。`excel-read --help` で全部のコマンドと引数が出る。
 
@@ -27,7 +27,7 @@ Excel は、Python などでスクリプトを書かずに、この Skill に入
 - `--sheet` を省くと、表示されている最初のワークシートを読む（隠したシートは飛ばす）。
 - 範囲（`--range` と設定の `range`）は `A1:H50`・`A4:F`（そのシートで使っている最後の行まで）・`A:F`・`A4`（そこから右下の端まで）の形。`$A$4:$F$12` の `$` は無視する。
 - 値の書き方：数はそのまま（整数は小数点なし）、日付は `2026-10-30`、日時は `2026-10-02T14:05:00`（表示形式でなく値で分けるので、日時の列でも 0 時ちょうどのセルは日付だけで出る）、時刻だけは `09:30:00`、時間の長さは `-01:20:00` のように符号付き、真偽は `true`・`false`、セルのエラーは `#DIV/0!` などの文字。空のセルと、空の文字（`""` を返す式など）は `null`（CSV では空）。
-- 終了コード：0 は成功、1 は読めない（ファイル・シート・設定の誤り）、2 は使い方の誤り。理由は標準エラーに出る。.xlsx は読みながら書くので、1 のときは出力（`--out` のファイルも）が途中までのことがある。使わずに読み直す。
+- 終了コード：0 は成功、1 は読めない（ファイル・シート・設定の誤り）、2 は使い方の誤り。理由は標準エラーに出る。.xlsx は読みながら書くので、1 のときは出力（`--out` のファイルも）が途中までのことがあるので、その出力は使わない。標準エラーの理由を見て、指定の誤りなら直して走らせ直し、ファイルが読めないなら下の「読めないとき」に進む。
 
 ## 進め方
 

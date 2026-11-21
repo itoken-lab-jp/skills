@@ -11,3 +11,7 @@ npx skills add itoken-lab-jp/skills -g --skill cold-read
 ```
 
 手順の本文は [SKILL.md](../skills/cold-read/SKILL.md) です。入れ方の詳しい説明は [README](../README.md#入れ方) にあります。
+
+## 変更履歴
+
+- 2026-11-21：二通りに読める文を、読み方が1つに決まる形に直した。読ませるのは3回までの数に、最後の版を軽いモデルに読ませる1回を入れないと決めた

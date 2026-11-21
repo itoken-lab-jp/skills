@@ -41,7 +41,7 @@ $t = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8)
 
 ## 確かめる
 
-書いたら、渡す相手の読み手で動かすか、少なくとも読ませて確かめる。手元で動かせないときは、確かめていないと書く。
+書いたら、渡す相手の読み手で動かすか、少なくとも読ませて確かめる。手元で動かせないときは、確かめていないと渡すときに書く。
 
 - .ps1：`powershell.exe -NoProfile -ExecutionPolicy Bypass -File <パス>` で動かす。動かすと困るスクリプト（PATH やレジストリを変える）は、構文だけを見る：
   `powershell.exe -NoProfile -Command "$e=$null; [void][System.Management.Automation.Language.Parser]::ParseFile('<パス>', [ref]$null, [ref]$e); $e.Count"`（0 なら読める。ParseFile は実行時と同じく BOM の有無で文字コードを決める）

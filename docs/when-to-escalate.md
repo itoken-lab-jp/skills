@@ -72,3 +72,4 @@ npx skills add itoken-lab-jp/skills -g --skill when-to-escalate
 ## 変更履歴
 
 - 2026-11-15：【移行が要る】名前を judgment-lines から when-to-escalate に変えた（中身は同じ）。古い名前で入れてある人は、`npx skills remove judgment-lines -g` で外し、`npx skills add itoken-lab-jp/skills -g --skill when-to-escalate` で入れ直す（リポジトリごとに入れた人は `-g` を外す）
+- 2026-11-21：二通りに読める文を、読み方が1つに決まる形に直した（事情を知らない AI に読ませて挙がった箇所）。主語や指す物の書き足しで、前後から読み取れた意図に合わせた

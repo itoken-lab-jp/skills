@@ -28,8 +28,8 @@ PBIP は Power BI Desktop の保存形式の一つで、レポートとモデル
 ## 守ること
 
 - **読み直す前に、未保存の変更が無いかを見る。** Bridge の CLI の `reload` は、未保存の変更を確認なしに捨ててディスクの状態にする（Desktop で消したビジュアルが戻った。2026-10-07）。`powerbi-desktop status` の `hasUnsavedChanges` が true なら止まり、ユーザーに保存してもらう。
-- **自分で開いた Desktop でなければ、読み直し・取り込み直し（MCP の `RefreshWithXMLA` など）をしない。** ユーザーの未保存の変更を消してしまう。ユーザーの Desktop なら、保存してもらってから、読み直してよいかを聞く。2 つ以上開いているときは、`status` の `pid` を `--pid` で渡し、`currentFilePath` が対象の PBIP かを見る。
-- **Desktop で同じ PBIP を開いたまま、MCP でモデルに書き込まない**（衝突する）。モデルはファイル（TMDL）に書く。
+- **自分で開いた Desktop でなければ、ユーザーに聞かずに読み直し・取り込み直し（MCP の `RefreshWithXMLA` など）をしない。** ユーザーの未保存の変更を消してしまう。ユーザーの Desktop なら、保存してもらってから読み直してよいかを聞き、よいと言われたら読み直す。2 つ以上開いているときは、`status` の `pid` を `--pid` で渡し、`currentFilePath` が対象の PBIP かを見る。
+- **Desktop で同じ PBIP を開いたまま、MCP でモデルの定義に書き込まない**（衝突する）。モデルはファイル（TMDL）に書く。
 - **Authoring MCP の EULA は、エージェントが受け入れない。** npm 版は EULA を受け入れるまでほかのツールを止める。`accept_eula` を呼ぶ・`--accept-eula` や `PBI_MODELING_MCP_ACCEPT_EULA` を付けるのは、ユーザーが条文を読んで同意すると自分の言葉で書いたときだけ。MCP が設定に無ければ、エージェントが自分で足さず、入れるかをユーザーに聞く。それまでは Desktop の DAX クエリ ビューを使う。
 - **MCP の書き込みの確認に頼らない。** 既定は `--readwrite`。2026-10-30 に Windows で起動したときは確認が出ず、`RefreshWithXMLA` がそのまま通った。書き込む前に、対象のモデルと操作をユーザーに示す。読むだけなら `--readonly` で起動する。
 - **npm の道具は版を固定する**（`npx -y @microsoft/powerbi-modeling-mcp@1.0.0 --start` のように）。0.x の CLI は形が変わりうる。

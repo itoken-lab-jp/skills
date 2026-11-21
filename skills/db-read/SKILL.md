@@ -5,7 +5,7 @@ description: DB（PostgreSQL・MySQL・SQL Server・Oracle）を読む・表や�
 
 # DB を読む
 
-DB は、Python などでドライバを入れてスクリプトを書かずに、この Skill に入っている道具 `db-read` で読む（スクリプトは入れる・走らせる・直すの往復で遅く、メモリも食う）。どの DB もクライアントのライブラリ（Oracle の Instant Client・ODBC のドライバなど）は要らない。読み取りのためのスクリプトは書かない。
+DB は、Python などでドライバを入れてスクリプトを書かずに、この Skill に入っている道具 `db-read` で読む（スクリプトは入れる・走らせる・直すの往復で遅く、メモリも食う）。どの DB もクライアントのライブラリ（Oracle の Instant Client・ODBC のドライバなど）は要らない。この道具が使える間は、読み取りのためのスクリプトを書かない。
 
 ## 道具の場所
 

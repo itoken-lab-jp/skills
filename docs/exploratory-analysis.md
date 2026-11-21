@@ -69,3 +69,4 @@ npx skills add itoken-lab-jp/skills -g --skill exploratory-analysis
 
 - 2026-11-15：【移行が要る】名前を research-discipline から exploratory-analysis に変えた（中身は同じ）。古い名前で入れてある人は、`npx skills remove research-discipline -g` で外し、`npx skills add itoken-lab-jp/skills -g --skill exploratory-analysis` で入れ直す（リポジトリごとに入れた人は `-g` を外す）
 - 2026-11-18：外れたときに、試した数が少ないなら「効かない」と読まず、どの大きさの差なら見分けられたかを書く、を足した
+- 2026-11-21：二通りに読める文を、読み方が1つに決まる形に直した（事情を知らない AI に読ませて挙がった箇所）。作りの癖を見るために分布を並べるときも、最後に1回だけ使う範囲は除くと明記した。同じデータを見てから直した版は、それぞれ1つと数える。「探索」として N に入れないのは、見立ての無い形と、結果に書いた「なぜ？」の確かめだけ。閉じるのは、同じ見立ての仲間を通算で3回外したとき
