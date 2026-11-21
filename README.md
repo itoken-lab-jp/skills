@@ -175,6 +175,16 @@ npx skills add itoken-lab-jp/skills -g --skill tacit-knowledge-interview general
 npx skills add itoken-lab-jp/skills -g --skill teaching
 ```
 
+### AI の返し方を自分に合わせる
+
+| 名前（説明へのリンク） | 使う場面 |
+|---|---|
+| [partner-persona](docs/partner-persona.md) | AI の返しが長い、質問ばかり、毎回1つに決めてくる、と感じるとき。MBTI のタイプ（知らなければ4つの二択）と困りごとを聞かせ、あなたが後回しにしがちな側を受け持つ「相方の人格」（1つ3行の文）を選ばせて、確かめてから指示ファイルに書き足させます。Claude・Codex・Gemini の素の返し方の違いに合わせて部品を絞ります |
+
+```
+npx skills add itoken-lab-jp/skills -g --skill partner-persona
+```
+
 ### アプリを操作させる
 
 | 名前（説明へのリンク） | 使う場面 |
