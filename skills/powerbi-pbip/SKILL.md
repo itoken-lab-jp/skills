@@ -29,14 +29,16 @@ PBIP は Power BI Desktop の保存形式の一つで、レポートとモデル
 
 - **読み直す前に、未保存の変更が無いかを見る。** Bridge の CLI の `reload` は、未保存の変更を確認なしに捨ててディスクの状態にする（Desktop で消したビジュアルが戻った。2026-10-07）。`powerbi-desktop status` の `hasUnsavedChanges` が true なら止まり、ユーザーに保存してもらう。
 - **自分で開いた Desktop でなければ、ユーザーに聞かずに読み直し・取り込み直し（MCP の `RefreshWithXMLA` など）をしない。** ユーザーの未保存の変更を消してしまう。ユーザーの Desktop なら、保存してもらってから読み直してよいかを聞き、よいと言われたら読み直す。2 つ以上開いているときは、`status` の `pid` を `--pid` で渡し、`currentFilePath` が対象の PBIP かを見る。
-- **Desktop で同じ PBIP を開いたまま、MCP でモデルの定義に書き込まない**（衝突する）。モデルはファイル（TMDL）に書く。
+- **モデルは TMDL のファイルに書く**。Desktop に MCP で書くのは頼まれたときだけにし、先に [references/authoring-mcp.md](references/authoring-mcp.md) を読む。
 - **Authoring MCP の EULA は、エージェントが受け入れない。** npm 版は EULA を受け入れるまでほかのツールを止める。`accept_eula` を呼ぶ・`--accept-eula` や `PBI_MODELING_MCP_ACCEPT_EULA` を付けるのは、ユーザーが条文を読んで同意すると自分の言葉で書いたときだけ。MCP が設定に無ければ、エージェントが自分で足さず、入れるかをユーザーに聞く。それまでは Desktop の DAX クエリ ビューを使う。
-- **MCP の書き込みの確認に頼らない。** 既定は `--readwrite`。2026-10-30 に Windows で起動したときは確認が出ず、`RefreshWithXMLA` がそのまま通った。書き込む前に、対象のモデルと操作をユーザーに示す。読むだけなら `--readonly` で起動する。
+- **MCP の書き込みの確認に頼らない。** 既定は `--readwrite` で、確認は出ない。書き込む前に、対象のモデルと操作をユーザーに示す。読むだけなら `--readonly` で起動する。
 - **npm の道具は版を固定する**（`npx -y @microsoft/powerbi-modeling-mcp@1.0.0 --start` のように）。0.x の CLI は形が変わりうる。
 
 ## PBIP を直すとき
 
 - 直す前に、Desktop で開いているなら保存してもらう（Desktop は保存するまでファイルに書かない）。ディスクのファイルが正。
+- **書いてから読み直すまで、Desktop で保存させない**（帯「Apply external changes」の間の保存で外の変更が消えた）。書いたあとに未保存の変更が見つかったら、保存も読み直しもせず止まる。読み直せないとき、まとめて書き換えるときは、閉じてから書く。
+- 名前の変更やページの複製で参照を書き換える前に [references/pbir-refs.md](references/pbir-refs.md) を読む。
 - 文字コードは BOM の無い UTF-8。パスは 260 文字まで。
 - `unappliedChanges.json`（`.SemanticModel` のフォルダー）があるときは、Desktop で保留中の変更を先に適用してもらってから TMDL を直す。適用しないままだと、外からの式の変更が捨てられる。
 - 外から直さない：`definition.pbir`、PBIR-Legacy の `report.json`、`mobileState.json`、`semanticModelDiagramLayout.json`、`diagramLayout.json`。ページ・ビジュアルのフォルダーを足す・名前を変える前と、PBIR を読み始める前に [references/pbip-files.md](references/pbip-files.md) を読む（フォルダー名の決まり、当たりの付け方）。レポートの CLI を使う前に [references/report-cli.md](references/report-cli.md) を読む。
@@ -46,7 +48,7 @@ PBIP は Power BI Desktop の保存形式の一つで、レポートとモデル
 - 表ごとに `definition/tables/<表>.tmdl`。メジャーは、集計する列のある表（前年比なら金額の列のある表）のファイルに `measure 名前 = 式` で書き、`formatString`（`0.0%`、`#,0` など）を付ける。説明は `///` の行に書く。
 - 足した物には `lineageTag` を書かず、ほかの物の `lineageTag` を写さない（保存のときに Desktop が付ける）。
 - M でエラーの行を捨てる（`Table.RemoveRowsWithErrors` など）と、何が落ちたかが見えなくなる。頼まれない限り使わず、エラーは直す。
-- 書き方は、Microsoft の skills-for-fabric（MIT）の `skills/semantic-model-authoring/references/` を、版のタグを付けて（`https://github.com/microsoft/skills-for-fabric/blob/v0.3.20/...`）要る所だけ読む。DAX（`CALCULATE`、時間の関数、ユーザー定義関数）は `dax-guidelines.md`、遅いメジャーは `dax-perf-decision-guide.md`、TMDL の書式は `tmdl-guidelines.md`。公式は「MCP がつながっていれば MCP で書く」とするが、この手順では TMDL のファイルに書く（差分が残り、Desktop と衝突しない）。
+- 書き方は、`https://github.com/microsoft/skills-for-fabric/blob/v0.3.20/skills/semantic-model-authoring/references/`（MIT）の要る所だけ読む。DAX は `dax-guidelines.md`、遅いメジャーは `dax-perf-decision-guide.md`、TMDL の書式は `tmdl-guidelines.md`。
 
 ### 値を確かめる
 
@@ -68,7 +70,7 @@ ORDER BY '売上'[部門]
 3. **Desktop に入れる**（下の表）。
 4. **DAX を流す。** Authoring MCP がつながっていれば `connection_operations` でつなぎ、`dax_query_operations` で流す。つながっていなければ、Desktop の DAX クエリ ビューに貼って流す（画面操作か、クエリを渡してユーザーに頼み、結果をもらう）。
 
-DAX の結果が 0 行でエラーも無いときは、まずデータが取り込まれているか（1）を疑う。DAX のクエリで正しくても、ビジュアルに届く値が同じとは限らない（凡例・スライサー・ビジュアルのフィルターはクエリと違う文脈で入る）。ビジュアルに使うときは、撮影でも見る。
+DAX の結果が 0 行でエラーも無いときは、まずデータが取り込まれているか（1）を疑う。数字や表示がエラーなしにずれるときと、メジャーを作る前は [references/numbers-check.md](references/numbers-check.md) を読む。DAX のクエリで正しくても、ビジュアルに届く値が同じとは限らない（凡例・スライサー・ビジュアルのフィルターはクエリと違う文脈で入る）。ビジュアルに使うときは、撮影でも見る。
 
 MCP につなぐ前に [references/authoring-mcp.md](references/authoring-mcp.md) を読む（引数の形、ポートの見つけ方、つなぐ先の取り違え）。
 
