@@ -345,7 +345,7 @@ function checkPptx(file, o, fail) {
     }
     // 日本語の文字は、東アジアの側（a:ea）のフォントで描かれる。a:ea が無いと、テーマの ea のフォントになる（テーマの ea が空のときだけ a:latin が使われる。2026-11 に PowerPoint の実機で確かめた）
     const noEa = [...xml.matchAll(/<a:r>([\s\S]*?)<\/a:r>/g)].find((r) => /<a:latin\b/.test(r[1]) && !/<a:ea\b/.test(r[1]) && /[\u3040-\u30ff\u4e00-\u9fff]/.test(r[1].replace(/<[^>]*>/g, '')));
-    if (noEa) add(n, 'font', `日本語の文字に、欧文の側（a:latin）のフォントしか指定が無い：「${short(dec(noEa[1].replace(/<[^>]*>/g, '')))}」ほか。PowerPoint は日本語を東アジアの側（a:ea）のフォントで描き、a:ea が無いとテーマの東アジアのフォント（日本語版の Office のテーマなら游ゴシックなど）になることがある。a:ea にも同じ名前を入れる。`);
+    if (noEa) add(n, 'font', `日本語の文字に、欧文の側（a:latin）のフォントしか指定が無い：「${short(dec(noEa[1].replace(/<[^>]*>/g, '')))}」ほか。PowerPoint は日本語を東アジアの側（a:ea）のフォントで描き、a:ea が無いとテーマの東アジアのフォント（日本語版の Office のテーマなら游ゴシックなど）になることがある。a:ea にも同じ名前を入れる。テンプレートのテーマのフォントを使うなら、a:latin の指定を外す。`);
     perSlide.push({ slide: n, fontsPt: [...fonts].sort((a, b) => b - a) });
   });
   // 描く
