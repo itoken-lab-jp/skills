@@ -1,8 +1,8 @@
 # adversarial-review
 
-cold-read が文章の伝わり方を見るのに対して、adversarial-review はコード・設計・文書の変更の欠陥を探します。作った AI に確かめさせると、作ったときの思い込みのまま読んでしまうため、意図の説明を渡さず、差分と守るべき条件（壊してはいけない計算や権限など）だけを別のエージェントに渡して欠陥を探させます。人は「この PR を adversarial-review して」と頼むだけで、、エージェントがレビュアーを立てて結果を受け取ります。
+cold-read が文章の伝わり方を見るのに対して、adversarial-review はコード・設計・文書の変更の欠陥を探します。作った AI に確認させると、作ったときの思い込みのまま読んでしまうため、意図の説明を渡さず、差分と守るべき条件（壊してはいけない計算や権限など）だけを別のエージェントに渡して欠陥を探させます。人は「この PR を adversarial-review して」と依頼するだけで、、エージェントがレビュアーを立てて結果を受け取ります。
 
-指摘は「誰が、どんなときに、何で困るか」まで書かせ、マージの前に直すもの（Important）と、マージを止めない細かいもの（Nit）に分けます。AI どうしで直す・レビューするを繰り返すと、Nit を直すたびに次のレビューが新しい Nit を出して終わりません。そこで、直すのにロジックを変える Nit はレビューの途中で手を付けず Issue に回し、Important が 0 になった回で打ち切ります。
+指摘は「誰が、どんなときに、何で困るか」まで書かせ、マージの前に修正するもの（Important）と、マージを止めない細かいもの（Nit）に分けます。AI どうしで修正する・レビューするを繰り返すと、Nit を修正するたびに次のレビューが新しい Nit を出して終わりません。そこで、修正するのにロジックを変える Nit はレビューの途中で手を付けず Issue に回し、Important が 0 になった回で打ち切ります。
 
 ## 参考にした資料
 
@@ -12,9 +12,9 @@ cold-read と adversarial-review は、次の資料を読んで手順に取り�
 |---|---|
 | Claude Code の docs [Code Review](https://code.claude.com/docs/en/code-review) | 指摘を Important と Nit に分ける線 |
 | Claude Code の docs [Create custom subagents](https://code.claude.com/docs/en/sub-agents) | サブエージェントに何が読み込まれるか（cold-read で、読み手に文脈を渡さない方法） |
-| claude.dev [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic/)（2026年10月） | 変更の前からあった欠陥に印を付ける。同じ形の欠陥はまとめて出す。Nit をレビューの途中で直さない |
+| claude.dev [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic/)（2026年10月） | 変更の前からあった欠陥に印を付ける。同じ形の欠陥はまとめて出す。Nit をレビューの途中で修正しない |
 | Anthropic [Harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)（2026年3月） | 指摘を受け取る AI は、正しい指摘を「大したことはない」と流しやすい。流した指摘も理由と一緒に残させる |
-| Anthropic [Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control)（2026年10月） | 実際に起こる筋書きを書けない心配に応えて直すと、作りすぎになる。そうした指摘は Nit にする |
+| Anthropic [Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control)（2026年10月） | 実際に起こる筋書きを書けない心配に応えて修正すると、作りすぎになる。そうした指摘は Nit にする |
 | Claude [Building agents: When to fold subagents into your main agent loop](https://claude.com/blog/building-agents-when-to-fold-subagents-into-your-main-agent-loop)（2026年10月） | サブエージェントは、作った本人と文脈を分けたい検証や、指示を読まない読み手のように、分ける理由があるときだけ使う |
 
 ## 入れ方
@@ -30,3 +30,4 @@ npx skills add itoken-lab-jp/skills -g --skill adversarial-review
 - 2026-11-15：報告にこの Skill の中の事情（敵対レビューを回したか、どの条件に当たったか）を書かない、を足した。
 - 2026-11-18：references を指す文を、何が書いてあるかと、いつ読むかを動作で書く形にそろえた（中身は同じ）
 - 2026-11-21：二通りに読める文を、読み方が1つに決まる形に直した（事情を知らない AI に読ませて挙がった箇所）。主語や指す物の書き足しで、前後から読み取れた意図に合わせた
+- 2026-11-27：本文の言葉を、仕事の文書でふつうに使う漢語にそろえた（確かめる→確認する、直す→修正する、頼む→依頼する など）。手順の中身は変えていない

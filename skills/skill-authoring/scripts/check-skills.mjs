@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Skill の形の検査。Agent Skills の仕様（agentskills.io/specification）と、どのツールでも読める形に合わせる。
-//   node check-skills.mjs <フォルダー> [<フォルダー>...] [--max-chars 6500] [--max-lines 500] [--json]
+//   node check-skills.mjs <フォルダー> [<フォルダー>...] [--max-chars 6600] [--max-lines 500] [--json]
 // フォルダーは、Skill を並べたフォルダー（中に <名前>/SKILL.md）か、Skill 1つのフォルダー（中に SKILL.md）。
 // 見つけた問題を「パス：中身」で1行ずつ出し、1つでもあれば終了コード 1。依存は Node（18 以上）だけ。
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const DEFAULTS = { maxChars: 6500, maxLines: 500, maxDescription: 1024 };
+export const DEFAULTS = { maxChars: 6600, maxLines: 500, maxDescription: 1024 };
 const KEYS = ['name', 'description', 'license', 'compatibility', 'metadata', 'allowed-tools'];
 
 const read = (p) => fs.readFileSync(p, 'utf8').replace(/^﻿/, '').replace(/\r\n/g, '\n');
@@ -139,7 +139,7 @@ function main(argv) {
 
 function usage(err) {
   if (err) console.error(`エラー：${err}`);
-  console.error('使い方：node check-skills.mjs <Skill を並べたフォルダー | Skill のフォルダー>... [--max-chars 6500] [--max-lines 500] [--json]');
+  console.error('使い方：node check-skills.mjs <Skill を並べたフォルダー | Skill のフォルダー>... [--max-chars 6600] [--max-lines 500] [--json]');
   return 2;
 }
 

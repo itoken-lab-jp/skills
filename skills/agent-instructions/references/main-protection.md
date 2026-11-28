@@ -10,5 +10,5 @@
 - 必須にする CI は、**どの PR でも必ず走って結果を返す job** にする。
   - workflow の `paths` / `paths-ignore` で走らなかった PR は報告が来ず、マージできなくなる。範囲の判定は job の中で行う。
   - 条件で skipped になった job を、GitHub は必須チェックの成功として扱う。同じコミットに後から来た skipped が、本物の失敗の上に重なって通ってしまう。draft や範囲外は、まとめ役の job（関門）が明示的に赤・緑を返す。
-- 入れたら、効いていることを確かめる：`gh api repos/<owner>/<repo>/rules/branches/main`。bot の定期のコミットがあれば、手動で1回走らせて通ることも見る。
-- CI そのものが壊れてマージできないときは、所有者が ruleset を一時的に Disabled にし、直したら必ず Active に戻す（`gh api repos/<owner>/<repo>/rulesets` の `enforcement` で確かめる）。手順をリポジトリの docs に書いておく。
+- 入れたら、効いていることを確認する：`gh api repos/<owner>/<repo>/rules/branches/main`。bot の定期のコミットがあれば、手動で1回走らせて通ることも見る。
+- CI そのものが壊れてマージできないときは、所有者が ruleset を一時的に Disabled にし、修正したら必ず Active に戻す（`gh api repos/<owner>/<repo>/rulesets` の `enforcement` で確認する）。手順をリポジトリの docs に書いておく。

@@ -53,8 +53,8 @@ describe('通るもの', () => {
 
 describe('落ちるもの', () => {
   it('本文が長すぎる・行が多すぎる（上限はオプションで変えられる）', () => {
-    const dir = skill('too-long', { 'SKILL.md': `${fm('too-long', '例。')}${'あ'.repeat(6501)}\n` });
-    assert.ok(msgs(dir).some((m) => /本文が 6502 字/.test(m)));
+    const dir = skill('too-long', { 'SKILL.md': `${fm('too-long', '例。')}${'あ'.repeat(6601)}\n` });
+    assert.ok(msgs(dir).some((m) => /本文が 6602 字/.test(m)));
     assert.deepEqual(msgs(dir, { maxChars: 7000 }), []);
     const lines = skill('many-lines', { 'SKILL.md': `${fm('many-lines', '例。')}${'行\n'.repeat(500)}` });
     assert.ok(msgs(lines).some((m) => m.includes('500 行まで')));

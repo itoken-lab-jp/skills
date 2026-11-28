@@ -1,6 +1,6 @@
 # db-read
 
-AI に DB を読ませると、Python のドライバを入れ、接続のスクリプトを書き、動かして直す往復が始まります。Oracle の Instant Client や SQL Server の ODBC のドライバのように、ドライバの前にクライアントのライブラリが要る DB もあります。db-read は、Skill に同梱した実行ファイル1つで PostgreSQL・MySQL・SQL Server・Oracle を読み、問い合わせの結果を CSV か JSON Lines で渡します。Python もクライアントのライブラリも要りません。
+AI に DB を読ませると、Python のドライバを入れ、接続のスクリプトを書き、動かして修正する往復が始まります。Oracle の Instant Client や SQL Server の ODBC のドライバのように、ドライバの前にクライアントのライブラリが要る DB もあります。db-read は、Skill に同梱した実行ファイル1つで PostgreSQL・MySQL・SQL Server・Oracle を読み、問い合わせの結果を CSV か JSON Lines で渡します。Python もクライアントのライブラリも要りません。
 
 次の例の `sales` は、設定に書いた接続の名前です。エージェントは、Skill のフォルダーの `scripts/` にある実行ファイルをフルパスで呼びます（例ではパスを略しています）。
 
@@ -22,7 +22,7 @@ db-read は読むための道具です。`SELECT` などで始まる文を1つ�
 
 ## 速さとメモリ
 
-20万行×5列（連番・日付・文字・金額・日時）の表を全部 CSV に出す作業を、db-read と、同じ CSV を作る Python のスクリプト2通りで比べました。db-read は、ドライバと csv のスクリプトの1.3〜4倍、pandas の1.8〜6倍の速さでした。メモリは、db-read が 8MB 以下で、Python のスクリプトは 29〜219MB でした。集計して数十行を返すような問い合わせは測っていません。そうした問い合わせでも、ドライバを入れずに済む点は変わりません。
+20万行×5列（連番・日付・文字・金額・日時）の表を全部 CSV に出す作業を、db-read と、同じ CSV を作る Python のスクリプト2通りで比較しました。db-read は、ドライバと csv のスクリプトの1.3〜4倍、pandas の1.8〜6倍の速さでした。メモリは、db-read が 8MB 以下で、Python のスクリプトは 29〜219MB でした。集計して数十行を返すような問い合わせは測っていません。そうした問い合わせでも、ドライバを入れずに済む点は変わりません。
 
 | DB | db-read | Python のドライバと csv | pandas の read_sql |
 |---|---|---|---|
@@ -34,7 +34,7 @@ db-read は読むための道具です。`SELECT` などで始まる文を1つ�
 - Python のドライバと csv：psycopg・PyMySQL・pymssql・python-oracledb でつなぎ、既定のカーソルで実行して、1万行ずつ取り出しながら標準の csv で書くスクリプトです（既定のカーソルでは、psycopg と PyMySQL は結果を一度に全部受け取ります）。
 - pandas の read_sql：同じドライバの接続を `pandas.read_sql` に渡し、`to_csv` で書くスクリプトです。
 - 時間は、どれも1回ずつ別のプロセスで起動してから CSV を書き終わるまで（Python は import も含む）を3回測った中央値です。メモリは最大の使用量（RSS）です。
-- 測った環境：2026年11月14日、クラウドの Linux（x64、4コア）。DB は同じ機械の Docker の PostgreSQL 17・MySQL 8.4・SQL Server 2022・Oracle 23 Free です。Python 3.13、psycopg 3.3.9、PyMySQL 2.2.8、pymssql 2.4.6、python-oracledb 26.1.0、pandas 3.0.5 です。Windows と Mac では測っていません。ネットワークの先の DB では、転送の時間が両方に同じだけ足されます。
+- 測った環境：2026年11月14日、クラウドの Linux（x64、4コア）。DB は同じ機械の Docker の PostgreSQL 17・MySQL 8.4・SQL Server 2022・Oracle 23 Free です。Python 3.13、psycopg 3.3.9、PyMySQL 2.2.8、pymssql 2.4.6、python-oracledb 26.1.0、pandas 3.0.5 です。Windows と Mac では測っていません。ネットワークの先の DB では、転送の時間が両方に同じだけ加わります。
 
 手元で測り直すには、[tools/db-read/bench/bench.py](../tools/db-read/bench/bench.py) の先頭に書いた手順で DB を立ててから、次を実行します。
 
@@ -42,13 +42,13 @@ db-read は読むための道具です。`SELECT` などで始まる文を1つ�
 python3 tools/db-read/bench/bench.py --rows 200000 --repeat 3
 ```
 
-AI にスクリプトを書かせると、ドライバを入れてスクリプトを書き、動かして直す往復の時間も加わります。この表には、その時間は入っていません。
+AI にスクリプトを書かせると、ドライバを入れてスクリプトを書き、動かして修正する往復の時間も加わります。この表には、その時間は入っていません。
 
 ## 実行ファイルについて
 
-同梱の実行ファイルは Windows（x64）・Mac（Apple シリコン）・Linux（x64）の3つで、1つ 6〜8MB です。Rust で書いたソースは [tools/db-read](../tools/db-read) にあり、実行ファイルにはソースの指紋が入っています。このリポジトリの CI は、指紋がソースと合うことと、3つの OS で実行ファイルが動くことを確かめています。本物の DB につなぐ試験（[fixtures](../tools/db-read/fixtures) の表を流し込んだ4つの DB と、自分の CA を使う MySQL・PostgreSQL）は、作者の側の CI で走らせています。手元で走らせる手順は [test/db-read.test.mjs](../test/db-read.test.mjs) の先頭にあります。
+同梱の実行ファイルは Windows（x64）・Mac（Apple シリコン）・Linux（x64）の3つで、1つ 6〜8MB です。Rust で書いたソースは [tools/db-read](../tools/db-read) にあり、実行ファイルにはソースの指紋が入っています。このリポジトリの CI は、指紋がソースと合うことと、3つの OS で実行ファイルが動くことを確認しています。本物の DB につなぐ試験（[fixtures](../tools/db-read/fixtures) の表を流し込んだ4つの DB と、自分の CA を使う MySQL・PostgreSQL）は、作者の側の CI で走らせています。手元で走らせる手順は [test/db-read.test.mjs](../test/db-read.test.mjs) の先頭にあります。
 
-- Oracle には、Oracle が公開している Rust のドライバ（oracledb）を使っています。このドライバはまだ beta です。作者の側の CI で、本物の Oracle 23 Free に毎回つないで確かめています。
+- Oracle には、Oracle が公開している Rust のドライバ（oracledb）を使っています。このドライバはまだ beta です。作者の側の CI で、本物の Oracle 23 Free に毎回つないで確認しています。
 - MySQL のドライバは、`ca_cert` を書いたときにその CA だけを信じるように1か所を手直ししています（[tools/db-read/vendor](../tools/db-read/vendor/README.md)）。
 - Windows と Linux の実行ファイルは [tools/db-read/build-all.sh](../tools/db-read/build-all.sh) で Linux の上で作り直せます。Mac の実行ファイルは Mac の上で `cargo build --release` で作ります。
 
@@ -64,3 +64,4 @@ npx skills add itoken-lab-jp/skills -g --skill db-read
 
 - 2026-11-18：references を指す文を、何が書いてあるかと、いつ読むかを動作で書く形にそろえた（中身は同じ）
 - 2026-11-21：二通りに読める文を、読み方が1つに決まる形に直した。スクリプトを書かないのは、この道具が使える間と明記した（道具が使えないときは、伝えたうえでほかの手段に移る）
+- 2026-11-27：本文の言葉を、仕事の文書でふつうに使う漢語にそろえた（確かめる→確認する、直す→修正する、頼む→依頼する など）。手順の中身は変えていない
